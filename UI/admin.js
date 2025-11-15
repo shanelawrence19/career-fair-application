@@ -1,40 +1,42 @@
 // ==============================
-// DEMO DATA: TABLES, COMPANIES, RESUMES, WALL SEGMENTS
+// DATA SETUP + LOADERS
 // ==============================
 
-// 4 rows x 8 columns = 32 tables in Hall A
-const demoTables = Array.from({ length: 32 }).map((_, i) => {
-  const row = Math.floor(i / 8) + 1;        // 1..4
-  const col = (i % 8) + 1;                  // 1..8
+const TOTAL_TABLES = 32;
+const TABLE_COLUMNS = 8;
+
+function createDefaultTables() {
+  return Array.from({ length: TOTAL_TABLES }).map((_, i) => {
+    const row = Math.floor(i / TABLE_COLUMNS) + 1;
+    const col = (i % TABLE_COLUMNS) + 1;
+    return {
+      id: `A${row}-${col}`,
+      label: `${row}${String.fromCharCode(64 + col)}`,
+      companyId: null,
+      isSponsor: false,
+      constraints: [],
+    };
+  });
+}
+
+let tables = createDefaultTables();
+
+let companies = [];
+
+let resumes = [];
+
+function createEmptyWallSegments() {
   return {
-    id: `A${row}-${col}`,                   // internal id
-    label: `${row}${String.fromCharCode(64 + col)}`, // e.g. 1A, 1B
-    companyId: null,
-    isSponsor: false,
-    constraints: [],                        // not used for constraints anymore, but kept for future
+    top: Array.from({ length: 8 }).map((_, i) => ({
+      id: `top-${i}`,
+      constraints: [],
+    })),
+    bottom: Array.from({ length: 8 }).map((_, i) => ({
+      id: `bottom-${i}`,
+      constraints: [],
+    })),
   };
-});
-
-// Demo companies
-const demoCompanies = [
-  { id: 1, name: "BlueShift Robotics", industry: "Software / Robotics", tableId: "A1-1", sponsorTier: "gold" },
-  { id: 2, name: "Lakefront Manufacturing", industry: "Manufacturing", tableId: "A1-2", sponsorTier: "none" },
-  { id: 3, name: "Northern Data Systems", industry: "IT / Consulting", tableId: "A1-3", sponsorTier: "silver" },
-  { id: 4, name: "Erie Health Partners", industry: "Healthcare", tableId: "A1-4", sponsorTier: "none" },
-  { id: 5, name: "Great Lakes Finance", industry: "Finance", tableId: "", sponsorTier: "none" },
-  { id: 6, name: "PennTech Labs", industry: "Engineering", tableId: "A2-1", sponsorTier: "gold" },
-  { id: 7, name: "Campus Innovators", industry: "Startup / Incubator", tableId: "A2-2", sponsorTier: "none" },
-  { id: 8, name: "Nittany Analytics", industry: "Data / Analytics", tableId: "A2-3", sponsorTier: "silver" },
-];
-
-// Demo resumes
-const demoResumes = [
-  { id: 1, studentName: "Jordan Smith", major: "Software Engineering", companyId: 1, filename: "Jordan_Smith_Resume.pdf" },
-  { id: 2, studentName: "Alex Nguyen", major: "Computer Science", companyId: 3, filename: "Alex_Nguyen_Resume.pdf" },
-  { id: 3, studentName: "Casey Patel", major: "Mechanical Engineering", companyId: 2, filename: "Casey_Patel_Resume.pdf" },
-  { id: 4, studentName: "Taylor Johnson", major: "Finance", companyId: 5, filename: "Taylor_Johnson_Resume.pdf" },
-  { id: 5, studentName: "Morgan Lee", major: "Cybersecurity Analytics", companyId: 3, filename: "Morgan_Lee_Resume.pdf" },
-];
+}
 
 // Constraint palette (walls only)
 const constraintTypes = [
@@ -44,26 +46,138 @@ const constraintTypes = [
 ];
 
 // Walls: top and bottom of the room, each broken into 8 segments
-const wallSegments = {
-  top: Array.from({ length: 8 }).map((_, i) => ({
-    id: `top-${i}`,
-    constraints: [], // e.g. ["door", "fire-ex"]
-  })),
-  bottom: Array.from({ length: 8 }).map((_, i) => ({
-    id: `bottom-${i}`,
-    constraints: [],
-  })),
-};
+let wallSegments = createEmptyWallSegments();
 
-// Attach initial sponsors to their tables
-demoCompanies.forEach((company) => {
-  if (!company.tableId) return;
-  const table = demoTables.find((t) => t.id === company.tableId);
-  if (table) {
-    table.companyId = company.id;
-    table.isSponsor = company.sponsorTier !== "none";
+// Optional: override the default endpoints before this script loads via window.CAREER_FAIR_BACKEND.
+const backendConfig =
+  (typeof window !== "undefined" && window.CAREER_FAIR_BACKEND) || {
+    layoutUrl: null,
+    companiesUrl: null,
+    resumesUrl: null,
+  };
+
+async function fetchSection(url) {
+  if (!url || typeof fetch !== "function") return null;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url} (${response.status})`);
   }
-});
+  return response.json();
+}
+
+function normalizeTables(rawTables) {
+  if (!Array.isArray(rawTables) || !rawTables.length) {
+    return createDefaultTables();
+  }
+
+  return rawTables.map((table, index) => ({
+    id: table.id || `table-${index + 1}`,
+    label: table.label || table.id || `T${index + 1}`,
+    companyId: table.companyId ?? null,
+    isSponsor: Boolean(table.isSponsor),
+    constraints: Array.isArray(table.constraints) ? [...table.constraints] : [],
+  }));
+}
+
+function normalizeWallSegments(rawSegments) {
+  if (!rawSegments || !rawSegments.top || !rawSegments.bottom) {
+    return createEmptyWallSegments();
+  }
+
+  return {
+    top: Array.from({ length: 8 }).map((_, index) => {
+      const segment = rawSegments.top[index] || {};
+      return {
+        id: segment.id || `top-${index}`,
+        constraints: Array.isArray(segment.constraints)
+          ? [...segment.constraints]
+          : [],
+      };
+    }),
+    bottom: Array.from({ length: 8 }).map((_, index) => {
+      const segment = rawSegments.bottom[index] || {};
+      return {
+        id: segment.id || `bottom-${index}`,
+        constraints: Array.isArray(segment.constraints)
+          ? [...segment.constraints]
+          : [],
+      };
+    }),
+  };
+}
+
+function normalizeCompanies(rawCompanies) {
+  if (!Array.isArray(rawCompanies)) return [];
+
+  return rawCompanies.map((company, index) => ({
+    id: company.id ?? index + 1,
+    name: company.name || "Unknown company",
+    industry: company.industry || "Unspecified",
+    tableId: company.tableId || "",
+    sponsorTier: company.sponsorTier || "none",
+  }));
+}
+
+function normalizeResumes(rawResumes) {
+  if (!Array.isArray(rawResumes)) return [];
+
+  return rawResumes.map((resume, index) => ({
+    id: resume.id ?? index + 1,
+    studentName: resume.studentName || "Unnamed student",
+    major: resume.major || "Major TBD",
+    companyId: resume.companyId ?? null,
+    filename: resume.filename || "resume.pdf",
+  }));
+}
+
+function syncTableAssignments() {
+  tables.forEach((table) => {
+    table.companyId = null;
+    table.isSponsor = false;
+  });
+
+  companies.forEach((company) => {
+    if (!company.tableId) return;
+    const table = tables.find((t) => t.id === company.tableId);
+    if (table) {
+      table.companyId = company.id;
+      table.isSponsor = company.sponsorTier !== "none";
+    }
+  });
+}
+
+async function loadInitialData() {
+  try {
+    const [layoutData, companiesData, resumesData] = await Promise.all([
+      fetchSection(backendConfig.layoutUrl),
+      fetchSection(backendConfig.companiesUrl),
+      fetchSection(backendConfig.resumesUrl),
+    ]);
+
+    if (layoutData) {
+      tables = normalizeTables(layoutData.tables || layoutData);
+      wallSegments = normalizeWallSegments(
+        layoutData.wallSegments || layoutData
+      );
+    } else {
+      tables = createDefaultTables();
+      wallSegments = createEmptyWallSegments();
+    }
+
+    companies = normalizeCompanies(
+      layoutData?.companies || companiesData || []
+    );
+    resumes = normalizeResumes(layoutData?.resumes || resumesData || []);
+  } catch (error) {
+    console.warn("Backend not available yet - using empty state.", error);
+    tables = createDefaultTables();
+    wallSegments = createEmptyWallSegments();
+    companies = [];
+    resumes = [];
+  }
+
+  syncTableAssignments();
+}
 
 // ==============================
 // SIDEBAR NAV + MOBILE SIDEBAR
@@ -143,7 +257,7 @@ function renderGridCells(container, compact) {
       rowDiv.className = "map-row";
       for (let c = 0; c < 8; c++) {
         const index = r * 8 + c;
-        const table = demoTables[index];
+        const table = tables[index];
         const cell = createTableCell(table, true);
         rowDiv.appendChild(cell);
       }
@@ -170,7 +284,7 @@ function renderGridCells(container, compact) {
     tableRow.className = "map-row";
     for (let c = 0; c < 8; c++) {
       const index = r * 8 + c;
-      const table = demoTables[index];
+      const table = tables[index];
       const cell = createTableCell(table, false);
       tableRow.appendChild(cell);
     }
@@ -213,7 +327,7 @@ function renderGridCells(container, compact) {
  * compact = true → used on dashboard, no drag/drop
  */
 function createTableCell(table, compact) {
-  const company = demoCompanies.find((c) => c.id === table.companyId) || null;
+  const company = companies.find((c) => c.id === table.companyId) || null;
 
   const cell = document.createElement("div");
   cell.className = "layout-cell";
@@ -313,7 +427,7 @@ function createWallCell(side, index) {
  * Also adds sponsor toggle + "Unassign table" button.
  */
 function showTableDetails(table) {
-  const company = demoCompanies.find((c) => c.id === table.companyId) || null;
+  const company = companies.find((c) => c.id === table.companyId) || null;
   const info = [];
 
   info.push(`<div>Table ID: <span class="layout-details-strong">${table.id}</span></div>`);
@@ -399,12 +513,12 @@ function handleDropOnTable(e, table) {
   const companyIdStr = e.dataTransfer.getData("companyId");
   if (!companyIdStr) return;
   const companyId = Number(companyIdStr);
-  const company = demoCompanies.find((c) => c.id === companyId);
+  const company = companies.find((c) => c.id === companyId);
   if (!company) return;
 
   // Unassign company from its previous table, if any
   if (company.tableId) {
-    const prevTable = demoTables.find((t) => t.id === company.tableId);
+    const prevTable = tables.find((t) => t.id === company.tableId);
     if (prevTable && prevTable.companyId === company.id) {
       prevTable.companyId = null;
       prevTable.isSponsor = false;
@@ -468,13 +582,6 @@ function unassignTable(table, company) {
   showTableDetails(table);
 }
 
-// Initial render of both maps
-renderGridCells(layoutGridEl, false);
-renderGridCells(dashboardLayoutGridEl, true);
-if (layoutTotalTablesEl) {
-  layoutTotalTablesEl.textContent = String(demoTables.length);
-}
-
 // ==============================
 // COMPANIES TABLE + FORM
 // ==============================
@@ -496,7 +603,7 @@ function renderCompanyTable() {
   let assignedCount = 0;
   let sponsorCount = 0;
 
-  demoCompanies.forEach((company) => {
+  companies.forEach((company) => {
     if (company.tableId) assignedCount += 1;
     if (company.sponsorTier !== "none") sponsorCount += 1;
 
@@ -554,7 +661,7 @@ function renderCompanyTable() {
 
     sponsorInput.addEventListener("change", () => {
       company.sponsorTier = sponsorInput.checked ? "gold" : "none";
-      const table = demoTables.find((t) => t.id === company.tableId);
+      const table = tables.find((t) => t.id === company.tableId);
       if (table) {
         table.isSponsor = sponsorInput.checked;
       }
@@ -569,7 +676,7 @@ function renderCompanyTable() {
     unassignButton.className = "button-danger-text";
     unassignButton.textContent = "Unassign";
     unassignButton.addEventListener("click", () => {
-      const table = demoTables.find((t) => t.id === company.tableId);
+      const table = tables.find((t) => t.id === company.tableId);
       if (table) {
         unassignTable(table, company);
       } else {
@@ -589,7 +696,7 @@ function renderCompanyTable() {
     companiesTableBody.appendChild(tr);
   });
 
-  companiesTotalEl.textContent = String(demoCompanies.length);
+  companiesTotalEl.textContent = String(companies.length);
   companiesAssignedEl.textContent = String(assignedCount);
   companiesSponsorsEl.textContent = String(sponsorCount);
 }
@@ -604,10 +711,10 @@ function renderTableOptions() {
   first.textContent = "Unassigned";
   companiesTableSelect.appendChild(first);
 
-  demoTables.forEach((table) => {
+  tables.forEach((table) => {
     const opt = document.createElement("option");
     opt.value = table.id;
-    const company = demoCompanies.find((c) => c.tableId === table.id);
+    const company = companies.find((c) => c.tableId === table.id);
     opt.textContent = company ? `${table.id} · ${company.name}` : table.id;
     companiesTableSelect.appendChild(opt);
   });
@@ -626,15 +733,15 @@ saveCompanyButton.addEventListener("click", () => {
     return;
   }
 
-  const newId = demoCompanies.length
-    ? Math.max(...demoCompanies.map((c) => c.id)) + 1
+  const newId = companies.length
+    ? Math.max(...companies.map((c) => c.id)) + 1
     : 1;
 
   // If some company already owns this table, free it
   if (tableId) {
-    const previousOwner = demoCompanies.find((c) => c.tableId === tableId);
+    const previousOwner = companies.find((c) => c.tableId === tableId);
     if (previousOwner) {
-      const prevTable = demoTables.find((t) => t.id === tableId);
+      const prevTable = tables.find((t) => t.id === tableId);
       if (prevTable && prevTable.companyId === previousOwner.id) {
         prevTable.companyId = null;
         prevTable.isSponsor = false;
@@ -642,14 +749,14 @@ saveCompanyButton.addEventListener("click", () => {
       previousOwner.tableId = "";
     }
 
-    const table = demoTables.find((t) => t.id === tableId);
+    const table = tables.find((t) => t.id === tableId);
     if (table) {
       table.companyId = newId;
       table.isSponsor = sponsorTier !== "none";
     }
   }
 
-  demoCompanies.push({
+  companies.push({
     id: newId,
     name,
     industry,
@@ -676,9 +783,6 @@ clearFiltersButton.addEventListener("click", () => {
   renderCompanyTable();
 });
 
-renderTableOptions();
-renderCompanyTable();
-
 // ==============================
 // PALETTES: DRAG SOURCES
 // ==============================
@@ -691,7 +795,7 @@ const constraintPaletteEl = document.getElementById("constraint-palette");
  */
 function renderCompanyPalette() {
   companyPaletteEl.innerHTML = "";
-  demoCompanies.forEach((company) => {
+  companies.forEach((company) => {
     const item = document.createElement("div");
     item.className = "palette-item palette-item-company";
     item.textContent = company.name;
@@ -728,9 +832,6 @@ function renderConstraintPalette() {
   });
 }
 
-renderCompanyPalette();
-renderConstraintPalette();
-
 // ==============================
 // RESUMES
 // ==============================
@@ -739,9 +840,9 @@ const resumeListEl = document.getElementById("resume-list");
 
 function renderResumes() {
   resumeListEl.innerHTML = "";
-  demoResumes.forEach((resume) => {
+  resumes.forEach((resume) => {
     const company =
-      demoCompanies.find((c) => c.id === resume.companyId) || { name: "Open to all" };
+      companies.find((c) => c.id === resume.companyId) || { name: "Open to all" };
 
     const item = document.createElement("div");
     item.className = "resume-item";
@@ -791,7 +892,26 @@ function renderResumes() {
   });
 }
 
-renderResumes();
+function renderAllViews() {
+  renderGridCells(layoutGridEl, false);
+  renderGridCells(dashboardLayoutGridEl, true);
+  if (layoutTotalTablesEl) {
+    layoutTotalTablesEl.textContent = String(tables.length);
+  }
+
+  renderCompanyTable();
+  renderTableOptions();
+  renderCompanyPalette();
+  renderConstraintPalette();
+  renderResumes();
+}
+
+async function initializeAdminDashboard() {
+  await loadInitialData();
+  renderAllViews();
+}
+
+initializeAdminDashboard();
 
 // ==============================
 // DASHBOARD METRICS RANDOMIZER
@@ -806,10 +926,10 @@ const metricResumes = document.getElementById("metric-resumes");
 const refreshDemoButton = document.getElementById("btn-refresh-demo");
 
 refreshDemoButton.addEventListener("click", () => {
-  const companyCount = demoCompanies.length + Math.floor(Math.random() * 3);
-  const tablesAssigned = demoTables.filter((t) => t.companyId).length;
-  const sponsorsCount = demoCompanies.filter((c) => c.sponsorTier !== "none").length;
-  const resumesCount = demoResumes.length * (1 + Math.floor(Math.random() * 3));
+  const companyCount = companies.length + Math.floor(Math.random() * 3);
+  const tablesAssigned = tables.filter((t) => t.companyId).length;
+  const sponsorsCount = companies.filter((c) => c.sponsorTier !== "none").length;
+  const resumesCount = resumes.length * (1 + Math.floor(Math.random() * 3));
 
   metricCompanies.textContent = String(companyCount);
   metricCompaniesTrend.textContent = `+${Math.floor(
@@ -817,7 +937,7 @@ refreshDemoButton.addEventListener("click", () => {
   )} since last check`;
   metricTablesAssigned.textContent = String(tablesAssigned);
   metricTablesFree.textContent = `${Math.max(
-    demoTables.length - tablesAssigned,
+    tables.length - tablesAssigned,
     0
   )} free`;
   metricSponsors.textContent = String(sponsorsCount);
