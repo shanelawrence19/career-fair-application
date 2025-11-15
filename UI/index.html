@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Career Fair Admin Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- External stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Backdrop for mobile sidebar -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <div class="app-shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-pill">CF</div>
+        <div>
+          <div class="brand-text-title">Career Fair Admin</div>
+          <div class="brand-text-sub">Behrend • Demo</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-section-label">Overview</div>
+        <div class="sidebar-nav-group">
+          <button class="sidebar-button active" data-view-target="view-dashboard">
+            <div class="sidebar-button-icon">📊</div>
+            <span>Dashboard</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-section-label">Career Fair</div>
+        <div class="sidebar-nav-group">
+          <button class="sidebar-button" data-view-target="view-companies">
+            <div class="sidebar-button-icon">🏢</div>
+            <span>Companies &amp; Tables</span>
+          </button>
+
+          <button class="sidebar-button" data-view-target="view-layout">
+            <div class="sidebar-button-icon">🗺️</div>
+            <span>Layout &amp; Map</span>
+          </button>
+
+          <button class="sidebar-button" data-view-target="view-resumes">
+            <div class="sidebar-button-icon">📂</div>
+            <span>Resumes</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-chip">
+          <div class="sidebar-chip-dot"></div>
+          <span>Demo mode · All data is mock</span>
+        </div>
+        <div>Frontend-only right now. Backend can plug into these screens later.</div>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main">
+      <!-- Top bar -->
+      <header class="topbar">
+        <button class="topbar-menu-button" id="topbar-menu-button">
+          ☰
+        </button>
+
+        <div class="topbar-title-wrap">
+          <div class="topbar-title">Admin Control Center</div>
+          <div class="topbar-subtitle">
+            Layout, companies, sponsors, and resumes for the upcoming fair.
+          </div>
+        </div>
+
+        <div class="topbar-spacer"></div>
+
+        <div class="topbar-chip-row">
+          <div class="pill-soft">
+            <span class="dot-green"></span>
+            <span>Fair status: Scheduled • Mar 2026</span>
+          </div>
+
+          <button class="pill-accent">
+            <span>Preview student app</span>
+          </button>
+
+          <div class="avatar">A</div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <section class="main-content">
+        <!-- DASHBOARD VIEW -->
+        <section class="view visible" id="view-dashboard">
+          <div class="view-heading-row">
+            <div>
+              <div class="view-title">Dashboard</div>
+              <div class="view-subtitle">
+                High-level snapshot of companies, tables, sponsors, and resumes.
+              </div>
+            </div>
+
+            <button class="button-ghost" id="btn-refresh-demo">
+              <span class="button-icon">⟳</span>
+              <span>Randomize demo stats</span>
+            </button>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="metric-label">Registered companies</div>
+              <div class="metric-value-row">
+                <div class="metric-value" id="metric-companies">28</div>
+                <div class="metric-chip">Goal: 30</div>
+              </div>
+              <div class="metric-trend" id="metric-companies-trend">
+                +4 since last check
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label">Tables assigned</div>
+              <div class="metric-value-row">
+                <div class="metric-value" id="metric-tables-assigned">22</div>
+                <div class="metric-chip" id="metric-tables-free">10 free</div>
+              </div>
+              <div class="metric-trend">Layout ~69% utilized</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label">Sponsor booths</div>
+              <div class="metric-value-row">
+                <div class="metric-value" id="metric-sponsors">6</div>
+                <div class="metric-chip">Gold &amp; Silver</div>
+              </div>
+              <div class="metric-trend">Sponsor map up to date</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label">Resumes uploaded</div>
+              <div class="metric-value-row">
+                <div class="metric-value" id="metric-resumes">83</div>
+                <div class="metric-chip">Students &amp; alumni</div>
+              </div>
+              <div class="metric-trend">+11 in last 24 hours</div>
+            </div>
+          </div>
+
+          <div class="layout">
+            <!-- Mini map -->
+            <div class="card card-alt">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Hall A overview</div>
+                  <div class="card-subtitle">
+                    Tables, aisles, and walls — scaled-down view.
+                  </div>
+                </div>
+
+                <div class="pill-tab-row">
+                  <button class="pill-tab active">Hall A</button>
+                  <button class="pill-tab">Hall B</button>
+                  <button class="pill-tab">Lobby</button>
+                </div>
+              </div>
+
+              <div class="map-frame map-frame-small">
+                <div class="map-grid" id="dashboard-layout-grid"></div>
+              </div>
+
+              <div class="horizontal-row map-legend">
+                <div class="badge badge-soft">Blue = assigned table</div>
+                <div class="badge badge-soft">Gold = sponsor table</div>
+                <div class="badge">🚪 Door • 🧯 Extinguisher • 🟩 Exit on walls</div>
+              </div>
+            </div>
+
+            <!-- Checklist -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Demo checklist</div>
+                  <div class="card-subtitle">
+                    Steps you can walk through live in your presentation.
+                  </div>
+                </div>
+              </div>
+
+              <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                <li>• Show overall metrics (companies, tables, sponsors, resumes).</li>
+                <li>• Switch to <b>Layout &amp; Map</b> and drag a company onto a table.</li>
+                <li>• Select that table and toggle <b>Sponsor booth</b> on/off.</li>
+                <li>• Drag a 🚪 door and 🧯 extinguisher onto the wall near the entrance.</li>
+                <li>• Unassign a table to show how layout can be adjusted quickly.</li>
+                <li>• Open <b>Resumes</b> and talk about recruiter access to files.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- COMPANIES VIEW -->
+        <section class="view" id="view-companies">
+          <div class="view-heading-row">
+            <div>
+              <div class="view-title">Companies &amp; Tables</div>
+              <div class="view-subtitle">
+                Registrations, table assignments, and sponsor status.
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="button-ghost" id="btn-clear-filters">
+                <span class="button-icon">✕</span>
+                <span>Clear filters</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="layout">
+            <div class="card card-alt">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Registered companies</div>
+                  <div class="card-subtitle">
+                    Assign companies to tables here or via drag &amp; drop on the map.
+                  </div>
+                </div>
+
+                <div class="horizontal-row">
+                  <div class="badge">
+                    Total: <span id="companies-total">0</span>
+                  </div>
+                  <div class="badge">
+                    Assigned: <span id="companies-assigned">0</span>
+                  </div>
+                  <div class="badge">
+                    Sponsors: <span id="companies-sponsors">0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="table-wrap scroll-y">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>Industry</th>
+                      <th>Table</th>
+                      <th>Sponsor</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="companies-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Add or update company</div>
+                  <div class="card-subtitle">
+                    For the demo, this stores data in memory only.
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label for="company-name">Company name</label>
+                  <input id="company-name" placeholder="e.g., BlueShift Robotics" />
+                </div>
+
+                <div class="field">
+                  <label for="company-industry">Industry</label>
+                  <input id="company-industry" placeholder="e.g., Software, Manufacturing" />
+                </div>
+
+                <div class="field">
+                  <label for="company-table">Table number</label>
+                  <select id="company-table">
+                    <option value="">Unassigned</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="company-sponsor">Sponsor tier</label>
+                  <select id="company-sponsor">
+                    <option value="none">None</option>
+                    <option value="gold">Gold</option>
+                    <option value="silver">Silver</option>
+                  </select>
+                </div>
+              </div>
+
+              <button class="button-primary" id="btn-save-company">
+                <span class="button-icon">➕</span>
+                <span>Save company</span>
+              </button>
+
+              <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+                Later, this can call your backend API (e.g., NestJS/Express) instead of staying in memory.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LAYOUT & MAP VIEW -->
+        <section class="view" id="view-layout">
+          <div class="view-heading-row">
+            <div>
+              <div class="view-title">Layout &amp; Map</div>
+              <div class="view-subtitle">
+                Walls, aisles, tables, and safety constraints with drag &amp; drop.
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="button-ghost">
+                <span class="button-icon">🖨️</span>
+                <span>Export map (demo)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="layout">
+            <!-- MAP SIDE -->
+            <div class="card card-alt">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Hall A map</div>
+                  <div class="card-subtitle">
+                    Students walk aisles between rows; doors and exits on the walls.
+                  </div>
+                </div>
+
+                <div class="horizontal-row">
+                  <div class="badge badge-soft">Drag companies onto tables</div>
+                  <div class="badge badge-soft">Drag 🚪 / 🧯 / 🟩 onto walls</div>
+                  <div class="badge">
+                    Total tables: <span id="layout-total-tables">0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="map-frame">
+                <!-- Entrances, aisles, and tables rendered here -->
+                <div class="map-grid" id="layout-grid"></div>
+              </div>
+
+              <div class="map-helper-text">
+                Top wall: hallway / entrance. Aisles run horizontally between table rows so
+                students can move through the room.
+              </div>
+            </div>
+
+            <!-- SIDE PANEL -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Selected table &amp; tools</div>
+                  <div class="card-subtitle">
+                    Use this to talk about sponsor booths and quick layout edits.
+                  </div>
+                </div>
+              </div>
+
+              <div class="layout-details" id="layout-details">
+                <div>Select any table in the map to see details.</div>
+              </div>
+
+              <!-- Palettes -->
+              <div class="layout-palette">
+                <div class="palette-section">
+                  <div class="palette-title">Companies</div>
+                  <div class="palette-subtitle">
+                    Drag a company chip and drop it onto a table.
+                  </div>
+                  <div id="company-palette" class="palette-list"></div>
+                </div>
+
+                <div class="palette-section">
+                  <div class="palette-title">Map constraints</div>
+                  <div class="palette-subtitle">
+                    Drag onto walls only (doors, fire extinguishers, exits).
+                  </div>
+                  <div id="constraint-palette" class="palette-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RESUMES VIEW -->
+        <section class="view" id="view-resumes">
+          <div class="view-heading-row">
+            <div>
+              <div class="view-title">Resumes</div>
+              <div class="view-subtitle">
+                Demo list of uploaded student resumes by company.
+              </div>
+            </div>
+
+            <button class="button-ghost">
+              <span class="button-icon">⬆</span>
+              <span>Upload test resume</span>
+            </button>
+          </div>
+
+          <div class="layout">
+            <div class="card card-alt">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Recently uploaded resumes</div>
+                  <div class="card-subtitle">
+                    Later, this will connect to secure storage (e.g., S3).
+                  </div>
+                </div>
+              </div>
+
+              <div class="resume-list" id="resume-list"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Demo talking points</div>
+                  <div class="card-subtitle">
+                    How recruiters interact with resumes during the fair.
+                  </div>
+                </div>
+              </div>
+
+              <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+                <li>• Students upload resumes ahead of time in the student app.</li>
+                <li>• Files are stored in cloud storage with access control.</li>
+                <li>• Recruiters filter by company, major, graduation date, etc.</li>
+                <li>• Everything is driven by the backend you’re building.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <!-- JS logic -->
+  <script src="admin.js"></script>
+</body>
+</html>
