@@ -1,22 +1,158 @@
 // ==============================
 // DATA SETUP + LOADERS
 // ==============================
+// This part builds simple sample data that follows the database tables
 
-const TOTAL_TABLES = 32;
-const TABLE_COLUMNS = 8;
+const DEFAULT_ROW_LETTERS = ["A", "B", "C", "D"];
+const DEFAULT_COLUMN_COUNT = 8;
 
-function createDefaultTables() {
-  return Array.from({ length: TOTAL_TABLES }).map((_, i) => {
-    const row = Math.floor(i / TABLE_COLUMNS) + 1;
-    const col = (i % TABLE_COLUMNS) + 1;
-    return {
-      id: `A${row}-${col}`,
-      label: `${row}${String.fromCharCode(64 + col)}`,
-      companyId: null,
-      isSponsor: false,
-      constraints: [],
-    };
-  });
+const sampleData = {
+  rooms: [{ room_id: 1, room_name: "Junker Hall A" }],
+  sponsor_levels: [
+    { sponsor_level_id: 1, level_name: "Gold" },
+    { sponsor_level_id: 2, level_name: "Silver" },
+    { sponsor_level_id: 3, level_name: "Bronze" },
+  ],
+  majors: [
+    { major_id: 1, major_name: "Computer Science" },
+    { major_id: 2, major_name: "Software Engineering" },
+    { major_id: 3, major_name: "Mechanical Engineering" },
+    { major_id: 4, major_name: "Electrical Engineering" },
+    { major_id: 5, major_name: "Cybersecurity" },
+  ],
+  position_types: [
+    { type_id: 1, type_name: "Internship" },
+    { type_id: 2, type_name: "Co-op" },
+    { type_id: 3, type_name: "Full-time" },
+  ],
+  position_titles: [
+    { title_id: 1, title_name: "Software Engineer" },
+    { title_id: 2, title_name: "Data Analyst" },
+    { title_id: 3, title_name: "Mechanical Engineer" },
+    { title_id: 4, title_name: "Product Manager" },
+    { title_id: 5, title_name: "Firmware Engineer" },
+  ],
+  companies: [
+    {
+      comp_id: 1,
+      comp_name: "Northwind Robotics",
+      sponsor_level_id: 1,
+      logo: null,
+      comp_desc: "Autonomous systems for supply chain and warehouse robotics.",
+      website: "https://northwindrobotics.example.com",
+      visa_sponsorship: 1,
+    },
+    {
+      comp_id: 2,
+      comp_name: "Lakehouse Analytics",
+      sponsor_level_id: 2,
+      logo: null,
+      comp_desc: "Data engineering and analytics consulting studio.",
+      website: "https://lakehouse-analytics.example.com",
+      visa_sponsorship: 1,
+    },
+    {
+      comp_id: 3,
+      comp_name: "Ironclad Manufacturing",
+      sponsor_level_id: 3,
+      logo: null,
+      comp_desc: "Heavy equipment, additive manufacturing, and prototyping.",
+      website: "https://ironclad-mfg.example.com",
+      visa_sponsorship: 0,
+    },
+    {
+      comp_id: 4,
+      comp_name: "Summit Energy",
+      sponsor_level_id: 2,
+      logo: null,
+      comp_desc: "Grid modernization and clean-energy analytics.",
+      website: "https://summit-energy.example.com",
+      visa_sponsorship: 0,
+    },
+    {
+      comp_id: 5,
+      comp_name: "Brightbridge Consulting",
+      sponsor_level_id: null,
+      logo: null,
+      comp_desc: "Technology strategy, product discovery, and PMO support.",
+      website: "https://brightbridge.example.com",
+      visa_sponsorship: 1,
+    },
+    {
+      comp_id: 6,
+      comp_name: "Keystone Medical Devices",
+      sponsor_level_id: 1,
+      logo: null,
+      comp_desc: "Embedded systems and QA for diagnostic devices.",
+      website: "https://keystone-med.example.com",
+      visa_sponsorship: 0,
+    },
+  ],
+  table_assignments: [
+    { assign_id: 1, room_id: 1, comp_id: 1, row_letter: "A", column_num: 1 },
+    { assign_id: 2, room_id: 1, comp_id: 2, row_letter: "A", column_num: 4 },
+    { assign_id: 3, room_id: 1, comp_id: 3, row_letter: "B", column_num: 2 },
+    { assign_id: 4, room_id: 1, comp_id: 4, row_letter: "B", column_num: 6 },
+    { assign_id: 5, room_id: 1, comp_id: 5, row_letter: "C", column_num: 3 },
+    { assign_id: 6, room_id: 1, comp_id: 6, row_letter: "C", column_num: 7 },
+  ],
+  company_majors: [
+    { company_major_id: 1, comp_id: 1, major_id: 1 },
+    { company_major_id: 2, comp_id: 1, major_id: 2 },
+    { company_major_id: 3, comp_id: 1, major_id: 5 },
+    { company_major_id: 4, comp_id: 2, major_id: 1 },
+    { company_major_id: 5, comp_id: 2, major_id: 5 },
+    { company_major_id: 6, comp_id: 3, major_id: 3 },
+    { company_major_id: 7, comp_id: 3, major_id: 4 },
+    { company_major_id: 8, comp_id: 4, major_id: 4 },
+    { company_major_id: 9, comp_id: 4, major_id: 1 },
+    { company_major_id: 10, comp_id: 5, major_id: 2 },
+    { company_major_id: 11, comp_id: 6, major_id: 4 },
+    { company_major_id: 12, comp_id: 6, major_id: 3 },
+  ],
+  company_position_types: [
+    { company_pos_types_id: 1, comp_id: 1, type_id: 1 },
+    { company_pos_types_id: 2, comp_id: 1, type_id: 3 },
+    { company_pos_types_id: 3, comp_id: 2, type_id: 1 },
+    { company_pos_types_id: 4, comp_id: 2, type_id: 2 },
+    { company_pos_types_id: 5, comp_id: 3, type_id: 2 },
+    { company_pos_types_id: 6, comp_id: 3, type_id: 3 },
+    { company_pos_types_id: 7, comp_id: 4, type_id: 3 },
+    { company_pos_types_id: 8, comp_id: 5, type_id: 1 },
+    { company_pos_types_id: 9, comp_id: 5, type_id: 2 },
+    { company_pos_types_id: 10, comp_id: 6, type_id: 1 },
+  ],
+  company_position_titles: [
+    { company_pos_titles_id: 1, comp_id: 1, title_id: 1 },
+    { company_pos_titles_id: 2, comp_id: 1, title_id: 5 },
+    { company_pos_titles_id: 3, comp_id: 2, title_id: 2 },
+    { company_pos_titles_id: 4, comp_id: 2, title_id: 4 },
+    { company_pos_titles_id: 5, comp_id: 3, title_id: 3 },
+    { company_pos_titles_id: 6, comp_id: 4, title_id: 5 },
+    { company_pos_titles_id: 7, comp_id: 4, title_id: 2 },
+    { company_pos_titles_id: 8, comp_id: 5, title_id: 4 },
+    { company_pos_titles_id: 9, comp_id: 6, title_id: 5 },
+  ],
+};
+
+function createDefaultTables(rowLetters = DEFAULT_ROW_LETTERS, columnCount = DEFAULT_COLUMN_COUNT, roomName = "Main hall") {
+  return rowLetters.flatMap((rowLetter) =>
+    Array.from({ length: columnCount }).map((_, colIndex) => {
+      const col = colIndex + 1;
+      const label = `${rowLetter}${col}`;
+      return {
+        id: `${roomName}-${label}`,
+        label,
+        companyId: null,
+        isSponsor: false,
+        constraints: [],
+        roomId: 1,
+        roomName,
+        rowLetter,
+        columnNum: col,
+      };
+    })
+  );
 }
 
 let tables = createDefaultTables();
@@ -25,16 +161,16 @@ let companies = [];
 
 let resumes = [];
 
-function createEmptyWallSegments() {
+function createEmptyWallSegments(columnCount = DEFAULT_COLUMN_COUNT) {
+  const buildRow = (prefix) =>
+    Array.from({ length: columnCount }).map((_, i) => ({
+      id: `${prefix}-${i}`,
+      constraints: [],
+    }));
+
   return {
-    top: Array.from({ length: 8 }).map((_, i) => ({
-      id: `top-${i}`,
-      constraints: [],
-    })),
-    bottom: Array.from({ length: 8 }).map((_, i) => ({
-      id: `bottom-${i}`,
-      constraints: [],
-    })),
+    top: buildRow("top"),
+    bottom: buildRow("bottom"),
   };
 }
 
@@ -45,8 +181,11 @@ const constraintTypes = [
   { type: "fire-exit", label: "Fire exit", short: "🟩" },
 ];
 
-// Walls: top and bottom of the room, each broken into 8 segments
 let wallSegments = createEmptyWallSegments();
+let gridConfig = {
+  rowLetters: DEFAULT_ROW_LETTERS,
+  columnCount: DEFAULT_COLUMN_COUNT,
+};
 
 // Optional: override the default endpoints before this script loads via window.CAREER_FAIR_BACKEND.
 const backendConfig =
@@ -67,7 +206,7 @@ async function fetchSection(url) {
 
 function normalizeTables(rawTables) {
   if (!Array.isArray(rawTables) || !rawTables.length) {
-    return createDefaultTables();
+    return createDefaultTables(gridConfig.rowLetters, gridConfig.columnCount);
   }
 
   return rawTables.map((table, index) => ({
@@ -76,16 +215,28 @@ function normalizeTables(rawTables) {
     companyId: table.companyId ?? null,
     isSponsor: Boolean(table.isSponsor),
     constraints: Array.isArray(table.constraints) ? [...table.constraints] : [],
+    roomId: table.roomId ?? 1,
+    roomName: table.roomName || "Main hall",
+    rowLetter:
+      table.rowLetter ||
+      gridConfig.rowLetters[index % gridConfig.rowLetters.length] ||
+      "A",
+    columnNum:
+      table.columnNum ||
+      ((index % (gridConfig.columnCount || DEFAULT_COLUMN_COUNT)) + 1),
   }));
 }
 
-function normalizeWallSegments(rawSegments) {
+function normalizeWallSegments(
+  rawSegments,
+  columnCount = gridConfig.columnCount || DEFAULT_COLUMN_COUNT
+) {
   if (!rawSegments || !rawSegments.top || !rawSegments.bottom) {
-    return createEmptyWallSegments();
+    return createEmptyWallSegments(columnCount);
   }
 
   return {
-    top: Array.from({ length: 8 }).map((_, index) => {
+    top: Array.from({ length: columnCount }).map((_, index) => {
       const segment = rawSegments.top[index] || {};
       return {
         id: segment.id || `top-${index}`,
@@ -94,7 +245,7 @@ function normalizeWallSegments(rawSegments) {
           : [],
       };
     }),
-    bottom: Array.from({ length: 8 }).map((_, index) => {
+    bottom: Array.from({ length: columnCount }).map((_, index) => {
       const segment = rawSegments.bottom[index] || {};
       return {
         id: segment.id || `bottom-${index}`,
@@ -106,15 +257,203 @@ function normalizeWallSegments(rawSegments) {
   };
 }
 
+function ensureWallSegments(columnCount = gridConfig.columnCount) {
+  wallSegments = normalizeWallSegments(wallSegments, columnCount);
+}
+
+function deriveRowLetters(assignments) {
+  const letters = Array.from(
+    new Set(
+      (assignments || [])
+        .map((assignment) => (assignment.row_letter || "").toString().toUpperCase())
+        .filter(Boolean)
+    )
+  ).sort();
+
+  return letters.length ? letters : DEFAULT_ROW_LETTERS;
+}
+
+function buildTablesFromData(data) {
+  const assignments = Array.isArray(data?.table_assignments)
+    ? data.table_assignments
+    : [];
+  const rowLetters = deriveRowLetters(assignments);
+  const maxColumnFromAssignments = assignments.reduce(
+    (max, assignment) => Math.max(max, Number(assignment.column_num) || 0),
+    0
+  );
+  const columnCount = Math.max(maxColumnFromAssignments, DEFAULT_COLUMN_COUNT - 2);
+  const room =
+    (Array.isArray(data?.rooms) && data.rooms.length && data.rooms[0]) || {
+      room_id: 1,
+      room_name: "Main hall",
+    };
+
+  const assignmentMap = new Map();
+  assignments.forEach((assignment) => {
+    const key = `${assignment.room_id || room.room_id}-${(assignment.row_letter || "")
+      .toString()
+      .toUpperCase()}-${assignment.column_num}`;
+    assignmentMap.set(key, assignment);
+  });
+
+  const tablesFromData = rowLetters.flatMap((rowLetter) =>
+    Array.from({ length: columnCount }).map((_, colIndex) => {
+      const columnNum = colIndex + 1;
+      const key = `${room.room_id}-${rowLetter}-${columnNum}`;
+      const assignment = assignmentMap.get(key);
+      return {
+        id: `${room.room_name}-${rowLetter}${columnNum}`,
+        label: `${rowLetter}${columnNum}`,
+        companyId: assignment?.comp_id ?? null,
+        isSponsor: false,
+        constraints: [],
+        roomId: room.room_id,
+        roomName: room.room_name,
+        rowLetter,
+        columnNum,
+      };
+    })
+  );
+
+  return {
+    tables: tablesFromData,
+    columnCount: tablesFromData.length
+      ? Math.max(...tablesFromData.map((t) => t.columnNum || 0))
+      : columnCount,
+    rowLetters,
+  };
+}
+
+function buildCompaniesFromData(data, tablesFromData) {
+  const sponsorMap = new Map(
+    (data?.sponsor_levels || []).map((level) => [
+      level.sponsor_level_id,
+      level.level_name,
+    ])
+  );
+  const majorsMap = new Map(
+    (data?.majors || []).map((major) => [major.major_id, major.major_name])
+  );
+  const positionTypesMap = new Map(
+    (data?.position_types || []).map((type) => [type.type_id, type.type_name])
+  );
+  const positionTitlesMap = new Map(
+    (data?.position_titles || []).map((title) => [title.title_id, title.title_name])
+  );
+
+  const majorsByCompany = new Map();
+  (data?.company_majors || []).forEach((entry) => {
+    const majorName = majorsMap.get(entry.major_id);
+    if (!majorName) return;
+    const existing = majorsByCompany.get(entry.comp_id) || [];
+    majorsByCompany.set(entry.comp_id, [...existing, majorName]);
+  });
+
+  const typesByCompany = new Map();
+  (data?.company_position_types || []).forEach((entry) => {
+    const typeName = positionTypesMap.get(entry.type_id);
+    if (!typeName) return;
+    const existing = typesByCompany.get(entry.comp_id) || [];
+    typesByCompany.set(entry.comp_id, [...existing, typeName]);
+  });
+
+  const titlesByCompany = new Map();
+  (data?.company_position_titles || []).forEach((entry) => {
+    const titleName = positionTitlesMap.get(entry.title_id);
+    if (!titleName) return;
+    const existing = titlesByCompany.get(entry.comp_id) || [];
+    titlesByCompany.set(entry.comp_id, [...existing, titleName]);
+  });
+
+  const tableByCompany = new Map();
+  tablesFromData.forEach((table) => {
+    if (table.companyId) {
+      tableByCompany.set(table.companyId, table);
+    }
+  });
+
+  const firstRoomName =
+    (Array.isArray(data?.rooms) && data.rooms[0]?.room_name) || "Room 1";
+
+  return (data?.companies || []).map((company, index) => {
+    const table = tableByCompany.get(company.comp_id);
+    const sponsorLabel = sponsorMap.get(company.sponsor_level_id) || "None";
+
+    const normalizedSponsorTier =
+      sponsorLabel && sponsorLabel.toLowerCase() !== "none"
+        ? sponsorLabel.toLowerCase()
+        : "none";
+
+    return {
+      id: company.comp_id ?? index + 1,
+      name: company.comp_name || "Unknown company",
+      description: company.comp_desc || "",
+      tableId: table?.id || "",
+      roomName: table?.roomName || firstRoomName,
+      rowLetter: table?.rowLetter || "",
+      columnNum: table?.columnNum || null,
+      sponsorTier: normalizedSponsorTier,
+      sponsorLabel,
+      sponsorLevelId: company.sponsor_level_id ?? null,
+      majors: majorsByCompany.get(company.comp_id) || [],
+      positionTypes: typesByCompany.get(company.comp_id) || [],
+      positionTitles: titlesByCompany.get(company.comp_id) || [],
+      website: company.website || "",
+      visa: Boolean(
+        company.visa_sponsorship === 1 ||
+          company.visa_sponsorship === "1" ||
+          company.visa_sponsorship === true
+      ),
+    };
+  });
+}
+
+function applyGridConfigFromTables(tableSet) {
+  const rowLetters = Array.from(
+    new Set(tableSet.map((table) => table.rowLetter).filter(Boolean))
+  ).sort();
+  const columnCount = tableSet.reduce(
+    (max, table) => Math.max(max, table.columnNum || 0),
+    0
+  );
+
+  gridConfig = {
+    rowLetters: rowLetters.length ? rowLetters : DEFAULT_ROW_LETTERS,
+    columnCount: columnCount || DEFAULT_COLUMN_COUNT,
+  };
+
+  ensureWallSegments(gridConfig.columnCount);
+}
+
+function seedFromSample(data = sampleData) {
+  const built = buildTablesFromData(data);
+  tables = built.tables;
+  applyGridConfigFromTables(tables);
+  wallSegments = createEmptyWallSegments(gridConfig.columnCount);
+  companies = buildCompaniesFromData(data, tables);
+  resumes = [];
+}
+
 function normalizeCompanies(rawCompanies) {
   if (!Array.isArray(rawCompanies)) return [];
 
   return rawCompanies.map((company, index) => ({
-    id: company.id ?? index + 1,
-    name: company.name || "Unknown company",
-    industry: company.industry || "Unspecified",
+    id: company.id ?? company.comp_id ?? index + 1,
+    name: company.name || company.comp_name || "Unknown company",
+    description: company.description || company.comp_desc || "",
     tableId: company.tableId || "",
-    sponsorTier: company.sponsorTier || "none",
+    roomName: company.roomName || "",
+    rowLetter: company.rowLetter || "",
+    columnNum: company.columnNum || null,
+    sponsorTier: (company.sponsorTier || "none").toString().toLowerCase(),
+    sponsorLabel: company.sponsorLabel || company.sponsorTier || "None",
+    sponsorLevelId: company.sponsor_level_id ?? null,
+    majors: company.majors || [],
+    positionTypes: company.positionTypes || [],
+    positionTitles: company.positionTitles || [],
+    website: company.website || "",
+    visa: Boolean(company.visa ?? company.visa_sponsorship ?? false),
   }));
 }
 
@@ -142,6 +481,9 @@ function syncTableAssignments() {
     if (table) {
       table.companyId = company.id;
       table.isSponsor = company.sponsorTier !== "none";
+      company.roomName = table.roomName;
+      company.rowLetter = table.rowLetter;
+      company.columnNum = table.columnNum;
     }
   });
 }
@@ -154,26 +496,24 @@ async function loadInitialData() {
       fetchSection(backendConfig.resumesUrl),
     ]);
 
-    if (layoutData) {
-      tables = normalizeTables(layoutData.tables || layoutData);
+    if (layoutData || companiesData) {
+      tables = normalizeTables(layoutData?.tables || layoutData || []);
+      applyGridConfigFromTables(tables);
       wallSegments = normalizeWallSegments(
-        layoutData.wallSegments || layoutData
+        layoutData?.wallSegments || layoutData,
+        gridConfig.columnCount
       );
-    } else {
-      tables = createDefaultTables();
-      wallSegments = createEmptyWallSegments();
-    }
 
-    companies = normalizeCompanies(
-      layoutData?.companies || companiesData || []
-    );
-    resumes = normalizeResumes(layoutData?.resumes || resumesData || []);
+      companies = normalizeCompanies(
+        layoutData?.companies || companiesData || []
+      );
+      resumes = normalizeResumes(layoutData?.resumes || resumesData || []);
+    } else {
+      seedFromSample(sampleData);
+    }
   } catch (error) {
-    console.warn("Backend not available yet - using empty state.", error);
-    tables = createDefaultTables();
-    wallSegments = createEmptyWallSegments();
-    companies = [];
-    resumes = [];
+    console.warn("Backend not available yet - using sample data.", error);
+    seedFromSample(sampleData);
   }
 
   syncTableAssignments();
@@ -182,6 +522,7 @@ async function loadInitialData() {
 // ==============================
 // SIDEBAR NAV + MOBILE SIDEBAR
 // ==============================
+// This handles switching views and showing the sidebar on small screens
 
 const sidebarButtons = Array.from(document.querySelectorAll(".sidebar-button"));
 const views = Array.from(document.querySelectorAll(".view"));
@@ -229,6 +570,7 @@ if (sidebarBackdrop) {
 // ==============================
 // MAP RENDERING (ROOM LAYOUT)
 // ==============================
+// This draws the room grid, walls, and tables
 
 const layoutGridEl = document.getElementById("layout-grid");
 const dashboardLayoutGridEl = document.getElementById("dashboard-layout-grid");
@@ -250,19 +592,43 @@ function getConstraintMeta(type) {
 function renderGridCells(container, compact) {
   container.innerHTML = "";
 
+  const rowLetters =
+    gridConfig.rowLetters && gridConfig.rowLetters.length
+      ? gridConfig.rowLetters
+      : deriveRowLetters([]);
+  const columnCount =
+    gridConfig.columnCount ||
+    tables.reduce((max, table) => Math.max(max, table.columnNum || 0), 0) ||
+    DEFAULT_COLUMN_COUNT;
+
+  ensureWallSegments(columnCount);
+
+  const findTable = (rowLetter, columnIndex) =>
+    tables.find(
+      (table) =>
+        table.rowLetter === rowLetter && Number(table.columnNum) === columnIndex
+    ) || {
+      id: `${rowLetter}${columnIndex}`,
+      label: `${rowLetter}${columnIndex}`,
+      companyId: null,
+      isSponsor: false,
+      constraints: [],
+      rowLetter,
+      columnNum: columnIndex,
+      roomName: tables[0]?.roomName || "Room",
+    };
+
   if (compact) {
-    // Compact view: just 4 rows of tables, no walls/aisles
-    for (let r = 0; r < 4; r++) {
+    rowLetters.forEach((rowLetter) => {
       const rowDiv = document.createElement("div");
       rowDiv.className = "map-row";
-      for (let c = 0; c < 8; c++) {
-        const index = r * 8 + c;
-        const table = tables[index];
+      for (let col = 1; col <= columnCount; col++) {
+        const table = findTable(rowLetter, col);
         const cell = createTableCell(table, true);
         rowDiv.appendChild(cell);
       }
       container.appendChild(rowDiv);
-    }
+    });
     return;
   }
 
@@ -271,30 +637,28 @@ function renderGridCells(container, compact) {
   // TOP WALL ROW (hallway / entrance side)
   const topRow = document.createElement("div");
   topRow.className = "map-row map-row-wall";
-  for (let col = 0; col < 8; col++) {
+  for (let col = 0; col < columnCount; col++) {
     const cell = createWallCell("top", col);
     topRow.appendChild(cell);
   }
   container.appendChild(topRow);
 
   // Table rows with aisles between them
-  for (let r = 0; r < 4; r++) {
-    // Tables row
+  rowLetters.forEach((rowLetter, rowIndex) => {
     const tableRow = document.createElement("div");
     tableRow.className = "map-row";
-    for (let c = 0; c < 8; c++) {
-      const index = r * 8 + c;
-      const table = tables[index];
+    for (let col = 1; col <= columnCount; col++) {
+      const table = findTable(rowLetter, col);
       const cell = createTableCell(table, false);
       tableRow.appendChild(cell);
     }
     container.appendChild(tableRow);
 
     // Aisle row between rows (not after last row)
-    if (r !== 3) {
+    if (rowIndex !== rowLetters.length - 1) {
       const aisleRow = document.createElement("div");
       aisleRow.className = "map-row map-row-aisle";
-      for (let c = 0; c < 8; c++) {
+      for (let c = 0; c < columnCount; c++) {
         const aisleCell = document.createElement("div");
         aisleCell.className = "map-aisle-cell";
 
@@ -310,12 +674,12 @@ function renderGridCells(container, compact) {
       }
       container.appendChild(aisleRow);
     }
-  }
+  });
 
   // BOTTOM WALL ROW
   const bottomRow = document.createElement("div");
   bottomRow.className = "map-row map-row-wall";
-  for (let col = 0; col < 8; col++) {
+  for (let col = 0; col < columnCount; col++) {
     const cell = createWallCell("bottom", col);
     bottomRow.appendChild(cell);
   }
@@ -374,17 +738,24 @@ function createTableCell(table, compact) {
  * side = "top" | "bottom"
  */
 function createWallCell(side, index) {
-  const segment = wallSegments[side][index];
+  const segment =
+    (wallSegments[side] && wallSegments[side][index]) || {
+      id: `${side}-${index}`,
+      constraints: [],
+    };
   const cell = document.createElement("div");
   cell.className = "map-wall-cell";
 
   const label = document.createElement("div");
   label.className = "map-wall-label";
+  const midpoint = Math.floor(
+    ((wallSegments[side] || []).length - 1) / 2
+  );
 
   // Give the middle segments names so it reads like a real room
-  if (side === "top" && index === 3) {
+  if (side === "top" && index === midpoint) {
     label.textContent = "Entrance";
-  } else if (side === "bottom" && index === 4) {
+  } else if (side === "bottom" && index === midpoint) {
     label.textContent = "Exit";
   } else if (index === 0) {
     label.textContent = side === "top" ? "North wall" : "South wall";
@@ -430,8 +801,17 @@ function showTableDetails(table) {
   const company = companies.find((c) => c.id === table.companyId) || null;
   const info = [];
 
-  info.push(`<div>Table ID: <span class="layout-details-strong">${table.id}</span></div>`);
-  info.push(`<div>Label: <span class="layout-details-strong">${table.label}</span></div>`);
+  info.push(
+    `<div>Table ID: <span class="layout-details-strong">${table.id}</span></div>`
+  );
+  info.push(
+    `<div>Room: <span class="layout-details-strong">${table.roomName}</span></div>`
+  );
+  info.push(
+    `<div>Row/Col: <span class="layout-details-strong">${table.rowLetter}${
+      table.columnNum || ""
+    }</span></div>`
+  );
   info.push(
     `<div>Assigned company: <span class="layout-details-strong">${
       company ? company.name : "Unassigned"
@@ -439,27 +819,52 @@ function showTableDetails(table) {
   );
 
   if (company) {
-    info.push(
-      `<div>Industry: <span class="layout-details-strong">${company.industry}</span></div>`
-    );
+    if (company.description) {
+      info.push(
+        `<div class="layout-details-strong" style="font-weight:500;">${company.description}</div>`
+      );
+    }
 
     const sponsorText =
-      company.sponsorTier === "none"
-        ? "No"
-        : company.sponsorTier.toUpperCase();
+      company.sponsorTier === "none" ? "None" : company.sponsorLabel;
     info.push(
-      `<div>Sponsor tier: <span class="layout-details-strong">${sponsorText}</span></div>`
+      `<div>Sponsor level: <span class="layout-details-strong">${sponsorText}</span></div>`
     );
 
-    // Sponsor toggle + unassign button
+    const majorsText = company.majors.length
+      ? company.majors.join(", ")
+      : "No majors linked";
+    info.push(
+      `<div>Majors: <span class="layout-details-strong">${majorsText}</span></div>`
+    );
+
+    const typesText = company.positionTypes.length
+      ? company.positionTypes.join(", ")
+      : "No position types set";
+    info.push(
+      `<div>Position types: <span class="layout-details-strong">${typesText}</span></div>`
+    );
+
+    const titlesText = company.positionTitles.length
+      ? company.positionTitles.join(", ")
+      : "No titles set";
+    info.push(
+      `<div>Position titles: <span class="layout-details-strong">${titlesText}</span></div>`
+    );
+
+    info.push(
+      `<div>Visa sponsorship: <span class="layout-details-strong">${
+        company.visa ? "Yes" : "No"
+      }</span></div>`
+    );
+
+    if (company.website) {
+      info.push(
+        `<div>Website: <a href="${company.website}" target="_blank" rel="noreferrer" class="layout-details-strong">${company.website}</a></div>`
+      );
+    }
+
     info.push(`
-      <div style="margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <label class="switch">
-          <input type="checkbox" id="layout-sponsor-toggle">
-          <span class="switch-slider"></span>
-        </label>
-        <span style="font-size:12px;">Mark this as a sponsor booth</span>
-      </div>
       <button class="button-ghost" id="layout-unassign-button" style="margin-top:8px;">
         Unassign company from this table
       </button>
@@ -473,27 +878,10 @@ function showTableDetails(table) {
   layoutDetailsEl.innerHTML =
     info.join("") +
     `<div style="margin-top:8px;">
-      This panel will eventually include more admin actions (e.g., notes for this table).
+      This panel shows data from rooms, tables, companies, sponsors, majors, and positions.
     </div>`;
 
-  // Wire up sponsor toggle and unassign button if we have a company
   if (company) {
-    const sponsorToggleInput = document.getElementById("layout-sponsor-toggle");
-    if (sponsorToggleInput) {
-      sponsorToggleInput.checked = company.sponsorTier !== "none";
-      sponsorToggleInput.addEventListener("change", () => {
-        // Change sponsor tier only from this toggle (drag/drop does NOT auto-sponsor)
-        company.sponsorTier = sponsorToggleInput.checked ? "gold" : "none";
-        table.isSponsor = sponsorToggleInput.checked;
-        renderCompanyTable();
-        renderGridCells(layoutGridEl, false);
-        renderGridCells(dashboardLayoutGridEl, true);
-        renderCompanyPalette();
-        // Re-show to update text
-        showTableDetails(table);
-      });
-    }
-
     const unassignButton = document.getElementById("layout-unassign-button");
     if (unassignButton) {
       unassignButton.addEventListener("click", () => {
@@ -528,6 +916,9 @@ function handleDropOnTable(e, table) {
   // Assign company to this table
   table.companyId = company.id;
   company.tableId = table.id;
+  company.roomName = table.roomName;
+  company.rowLetter = table.rowLetter;
+  company.columnNum = table.columnNum;
 
   // Sponsor status depends ONLY on sponsorTier; drag/drop does not auto-sponsor
   table.isSponsor = company.sponsorTier !== "none";
@@ -535,7 +926,6 @@ function handleDropOnTable(e, table) {
   renderCompanyTable();
   renderGridCells(layoutGridEl, false);
   renderGridCells(dashboardLayoutGridEl, true);
-  renderTableOptions();
   renderCompanyPalette();
   showTableDetails(table);
 }
@@ -550,7 +940,9 @@ function handleDropOnWall(e, side, index) {
   const constraintType = e.dataTransfer.getData("constraintType");
   if (!constraintType) return;
 
-  const segment = wallSegments[side][index];
+  const segment =
+    (wallSegments[side] && wallSegments[side][index]) ||
+    (wallSegments[side][index] = { id: `${side}-${index}`, constraints: [] });
   if (!segment.constraints.includes(constraintType)) {
     segment.constraints.push(constraintType);
   }
@@ -570,6 +962,8 @@ function unassignTable(table, company) {
   }
   if (company.tableId === table.id) {
     company.tableId = "";
+    company.rowLetter = "";
+    company.columnNum = null;
   }
 
   table.isSponsor = false; // sponsor is about table location; company still has tier
@@ -577,7 +971,6 @@ function unassignTable(table, company) {
   renderCompanyTable();
   renderGridCells(layoutGridEl, false);
   renderGridCells(dashboardLayoutGridEl, true);
-  renderTableOptions();
   renderCompanyPalette();
   showTableDetails(table);
 }
@@ -585,16 +978,12 @@ function unassignTable(table, company) {
 // ==============================
 // COMPANIES TABLE + FORM
 // ==============================
+// This renders the company list from the sample data
 
 const companiesTableBody = document.getElementById("companies-table-body");
 const companiesTotalEl = document.getElementById("companies-total");
 const companiesAssignedEl = document.getElementById("companies-assigned");
 const companiesSponsorsEl = document.getElementById("companies-sponsors");
-const companiesTableSelect = document.getElementById("company-table");
-const companiesNameInput = document.getElementById("company-name");
-const companiesIndustryInput = document.getElementById("company-industry");
-const companiesSponsorSelect = document.getElementById("company-sponsor");
-
 /**
  * Render company table (list) with badges at the top.
  */
@@ -610,19 +999,39 @@ function renderCompanyTable() {
     const tr = document.createElement("tr");
 
     const nameTd = document.createElement("td");
-    nameTd.textContent = company.name;
+    const nameLine = document.createElement("div");
+    nameLine.textContent = company.name;
+    const descLine = document.createElement("div");
+    descLine.className = "table-subtext";
+    descLine.textContent = company.description || "No description provided";
+    nameTd.appendChild(nameLine);
+    nameTd.appendChild(descLine);
     tr.appendChild(nameTd);
 
-    const indTd = document.createElement("td");
-    indTd.textContent = company.industry;
-    tr.appendChild(indTd);
+    const websiteTd = document.createElement("td");
+    if (company.website) {
+      const link = document.createElement("a");
+      link.href = company.website;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = company.website.replace(/^https?:\/\//, "");
+      websiteTd.appendChild(link);
+    } else {
+      websiteTd.textContent = "Not provided";
+    }
+    tr.appendChild(websiteTd);
 
     const tableTd = document.createElement("td");
     if (company.tableId) {
       const tag = document.createElement("span");
       tag.className = "tag";
-      tag.textContent = company.tableId;
+      tag.textContent = `${company.rowLetter}${company.columnNum || ""}`;
       tableTd.appendChild(tag);
+
+      const roomLine = document.createElement("div");
+      roomLine.className = "table-subtext";
+      roomLine.textContent = company.roomName || "Room TBD";
+      tableTd.appendChild(roomLine);
     } else {
       const tag = document.createElement("span");
       tag.className = "tag tag-unassigned";
@@ -634,64 +1043,34 @@ function renderCompanyTable() {
     const sponsorTd = document.createElement("td");
     const label = document.createElement("span");
     label.className = "tag" + (company.sponsorTier !== "none" ? " tag-sponsor" : "");
-    label.textContent =
-      company.sponsorTier === "none"
-        ? "None"
-        : company.sponsorTier === "gold"
-        ? "Gold"
-        : "Silver";
+    label.textContent = company.sponsorTier === "none" ? "None" : company.sponsorLabel;
     sponsorTd.appendChild(label);
     tr.appendChild(sponsorTd);
 
-    const actionsTd = document.createElement("td");
-    actionsTd.style.display = "flex";
-    actionsTd.style.alignItems = "center";
-    actionsTd.style.gap = "8px";
+    const majorsTd = document.createElement("td");
+    const majorsLine = document.createElement("div");
+    majorsLine.textContent = company.majors.length
+      ? company.majors.join(", ")
+      : "No majors linked";
+    majorsTd.appendChild(majorsLine);
+    const rolesLine = document.createElement("div");
+    rolesLine.className = "table-subtext";
+    const typesText = company.positionTypes.length
+      ? `Types: ${company.positionTypes.join(", ")}`
+      : "Types: none";
+    const titlesText = company.positionTitles.length
+      ? `Titles: ${company.positionTitles.join(", ")}`
+      : "Titles: none";
+    rolesLine.textContent = `${typesText} | ${titlesText}`;
+    majorsTd.appendChild(rolesLine);
+    tr.appendChild(majorsTd);
 
-    // Sponsor toggle (controls sponsorTier; map color updates)
-    const sponsorSwitchLabel = document.createElement("label");
-    sponsorSwitchLabel.className = "switch";
-    const sponsorInput = document.createElement("input");
-    sponsorInput.type = "checkbox";
-    sponsorInput.checked = company.sponsorTier !== "none";
-    const sponsorSlider = document.createElement("span");
-    sponsorSlider.className = "switch-slider";
-    sponsorSwitchLabel.appendChild(sponsorInput);
-    sponsorSwitchLabel.appendChild(sponsorSlider);
-
-    sponsorInput.addEventListener("change", () => {
-      company.sponsorTier = sponsorInput.checked ? "gold" : "none";
-      const table = tables.find((t) => t.id === company.tableId);
-      if (table) {
-        table.isSponsor = sponsorInput.checked;
-      }
-      renderCompanyTable();
-      renderGridCells(layoutGridEl, false);
-      renderGridCells(dashboardLayoutGridEl, true);
-      renderCompanyPalette();
-    });
-
-    // Unassign button from the company side
-    const unassignButton = document.createElement("button");
-    unassignButton.className = "button-danger-text";
-    unassignButton.textContent = "Unassign";
-    unassignButton.addEventListener("click", () => {
-      const table = tables.find((t) => t.id === company.tableId);
-      if (table) {
-        unassignTable(table, company);
-      } else {
-        company.tableId = "";
-        renderCompanyTable();
-        renderGridCells(layoutGridEl, false);
-        renderGridCells(dashboardLayoutGridEl, true);
-        renderTableOptions();
-        renderCompanyPalette();
-      }
-    });
-
-    actionsTd.appendChild(sponsorSwitchLabel);
-    actionsTd.appendChild(unassignButton);
-    tr.appendChild(actionsTd);
+    const visaTd = document.createElement("td");
+    const visaLabel = document.createElement("span");
+    visaLabel.className = "tag" + (company.visa ? "" : " tag-unassigned");
+    visaLabel.textContent = company.visa ? "Yes" : "No";
+    visaTd.appendChild(visaLabel);
+    tr.appendChild(visaTd);
 
     companiesTableBody.appendChild(tr);
   });
@@ -701,91 +1080,21 @@ function renderCompanyTable() {
   companiesSponsorsEl.textContent = String(sponsorCount);
 }
 
-/**
- * Populate table dropdown for the company form.
- */
-function renderTableOptions() {
-  companiesTableSelect.innerHTML = "";
-  const first = document.createElement("option");
-  first.value = "";
-  first.textContent = "Unassigned";
-  companiesTableSelect.appendChild(first);
-
-  tables.forEach((table) => {
-    const opt = document.createElement("option");
-    opt.value = table.id;
-    const company = companies.find((c) => c.tableId === table.id);
-    opt.textContent = company ? `${table.id} · ${company.name}` : table.id;
-    companiesTableSelect.appendChild(opt);
-  });
+function resetToSampleSeed() {
+  seedFromSample(sampleData);
+  syncTableAssignments();
+  renderAllViews();
 }
-
-// Save company (create-only for now)
-const saveCompanyButton = document.getElementById("btn-save-company");
-saveCompanyButton.addEventListener("click", () => {
-  const name = companiesNameInput.value.trim();
-  const industry = companiesIndustryInput.value.trim();
-  const tableId = companiesTableSelect.value;
-  const sponsorTier = companiesSponsorSelect.value;
-
-  if (!name || !industry) {
-    alert("Please provide at least a name and an industry.");
-    return;
-  }
-
-  const newId = companies.length
-    ? Math.max(...companies.map((c) => c.id)) + 1
-    : 1;
-
-  // If some company already owns this table, free it
-  if (tableId) {
-    const previousOwner = companies.find((c) => c.tableId === tableId);
-    if (previousOwner) {
-      const prevTable = tables.find((t) => t.id === tableId);
-      if (prevTable && prevTable.companyId === previousOwner.id) {
-        prevTable.companyId = null;
-        prevTable.isSponsor = false;
-      }
-      previousOwner.tableId = "";
-    }
-
-    const table = tables.find((t) => t.id === tableId);
-    if (table) {
-      table.companyId = newId;
-      table.isSponsor = sponsorTier !== "none";
-    }
-  }
-
-  companies.push({
-    id: newId,
-    name,
-    industry,
-    tableId: tableId || "",
-    sponsorTier,
-  });
-
-  companiesNameInput.value = "";
-  companiesIndustryInput.value = "";
-  companiesSponsorSelect.value = "none";
-  companiesTableSelect.value = "";
-
-  renderCompanyTable();
-  renderGridCells(layoutGridEl, false);
-  renderGridCells(dashboardLayoutGridEl, true);
-  renderTableOptions();
-  renderCompanyPalette();
-
-  alert("Demo: company saved (in-memory only).");
-});
 
 const clearFiltersButton = document.getElementById("btn-clear-filters");
 clearFiltersButton.addEventListener("click", () => {
-  renderCompanyTable();
+  resetToSampleSeed();
 });
 
 // ==============================
 // PALETTES: DRAG SOURCES
 // ==============================
+// This builds the draggable chips for companies and wall items
 
 const companyPaletteEl = document.getElementById("company-palette");
 const constraintPaletteEl = document.getElementById("constraint-palette");
@@ -798,7 +1107,11 @@ function renderCompanyPalette() {
   companies.forEach((company) => {
     const item = document.createElement("div");
     item.className = "palette-item palette-item-company";
-    item.textContent = company.name;
+    const sponsorLabel = company.sponsorLabel || company.sponsorTier;
+    item.textContent =
+      company.sponsorTier === "none"
+        ? company.name
+        : `${company.name} (${sponsorLabel})`;
     item.draggable = true;
     item.dataset.companyId = company.id;
 
@@ -835,6 +1148,7 @@ function renderConstraintPalette() {
 // ==============================
 // RESUMES
 // ==============================
+// This renders the basic resume list
 
 const resumeListEl = document.getElementById("resume-list");
 
@@ -857,7 +1171,7 @@ function renderResumes() {
 
     const metaEl = document.createElement("div");
     metaEl.className = "resume-meta";
-    metaEl.textContent = `${resume.major} • Target: ${company.name}`;
+    metaEl.textContent = `${resume.major} - Target: ${company.name}`;
     main.appendChild(metaEl);
 
     const fileEl = document.createElement("div");
@@ -872,14 +1186,14 @@ function renderResumes() {
     viewButton.className = "button-ghost";
     viewButton.textContent = "View";
     viewButton.addEventListener("click", () => {
-      alert("Demo: this would open the PDF in a new tab.");
+      alert("View action can open the file when hooked up.");
     });
 
     const downloadButton = document.createElement("button");
     downloadButton.className = "button-ghost";
     downloadButton.textContent = "Download";
     downloadButton.addEventListener("click", () => {
-      alert("Demo: this would download the resume.");
+      alert("Download action can be wired to the backend.");
     });
 
     actions.appendChild(viewButton);
@@ -900,10 +1214,10 @@ function renderAllViews() {
   }
 
   renderCompanyTable();
-  renderTableOptions();
   renderCompanyPalette();
   renderConstraintPalette();
   renderResumes();
+  renderMetrics();
 }
 
 async function initializeAdminDashboard() {
@@ -914,8 +1228,9 @@ async function initializeAdminDashboard() {
 initializeAdminDashboard();
 
 // ==============================
-// DASHBOARD METRICS RANDOMIZER
+// DASHBOARD METRICS
 // ==============================
+// This refreshes the simple metrics at the top
 
 const metricCompanies = document.getElementById("metric-companies");
 const metricCompaniesTrend = document.getElementById("metric-companies-trend");
@@ -923,23 +1238,42 @@ const metricTablesAssigned = document.getElementById("metric-tables-assigned");
 const metricTablesFree = document.getElementById("metric-tables-free");
 const metricSponsors = document.getElementById("metric-sponsors");
 const metricResumes = document.getElementById("metric-resumes");
-const refreshDemoButton = document.getElementById("btn-refresh-demo");
+const refreshStatsButton = document.getElementById("btn-refresh-stats");
 
-refreshDemoButton.addEventListener("click", () => {
-  const companyCount = companies.length + Math.floor(Math.random() * 3);
+function renderMetrics() {
+  const companyCount = companies.length;
   const tablesAssigned = tables.filter((t) => t.companyId).length;
   const sponsorsCount = companies.filter((c) => c.sponsorTier !== "none").length;
-  const resumesCount = resumes.length * (1 + Math.floor(Math.random() * 3));
+  const majorsCovered = new Set(
+    companies.flatMap((c) => c.majors || [])
+  ).size;
 
   metricCompanies.textContent = String(companyCount);
-  metricCompaniesTrend.textContent = `+${Math.floor(
-    Math.random() * 6
-  )} since last check`;
+  metricCompaniesTrend.textContent = "Sample data loaded";
   metricTablesAssigned.textContent = String(tablesAssigned);
   metricTablesFree.textContent = `${Math.max(
     tables.length - tablesAssigned,
     0
   )} free`;
   metricSponsors.textContent = String(sponsorsCount);
-  metricResumes.textContent = String(resumesCount);
+  metricResumes.textContent = String(majorsCovered);
+}
+
+refreshStatsButton.addEventListener("click", () => {
+  renderMetrics();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

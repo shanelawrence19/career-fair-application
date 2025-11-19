@@ -2,24 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Career Fair Admin Demo</title>
+  <title>Career Fair Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- External stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Simple admin layout for career fair data -->
   <!-- Backdrop for mobile sidebar -->
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
+  <!-- Page shell wraps sidebar and main content -->
   <div class="app-shell">
-    <!-- SIDEBAR -->
+    <!-- Sidebar navigation -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="brand-pill">CF</div>
         <div>
           <div class="brand-text-title">Career Fair Admin</div>
-          <div class="brand-text-sub">Behrend • Demo</div>
+          <div class="brand-text-sub">Career Fair</div>
         </div>
       </div>
 
@@ -54,17 +55,13 @@
       </div>
 
       <div class="sidebar-footer">
-        <div class="sidebar-chip">
-          <div class="sidebar-chip-dot"></div>
-          <span>Demo mode · All data is mock</span>
-        </div>
-        <div>Frontend-only right now. Backend can plug into these screens later.</div>
+        <div>Sample data is shown. Backend can plug in later.</div>
       </div>
     </aside>
 
     <!-- MAIN AREA -->
     <main class="main">
-      <!-- Top bar -->
+      <!-- Top bar with title and quick actions -->
       <header class="topbar">
         <button class="topbar-menu-button" id="topbar-menu-button">
           ☰
@@ -96,6 +93,7 @@
       <!-- MAIN CONTENT -->
       <section class="main-content">
         <!-- DASHBOARD VIEW -->
+        <!-- Dashboard with quick stats -->
         <section class="view visible" id="view-dashboard">
           <div class="view-heading-row">
             <div>
@@ -105,31 +103,31 @@
               </div>
             </div>
 
-            <button class="button-ghost" id="btn-refresh-demo">
+            <button class="button-ghost" id="btn-refresh-stats">
               <span class="button-icon">⟳</span>
-              <span>Randomize demo stats</span>
+              <span>Refresh stats</span>
             </button>
           </div>
 
           <div class="metrics-row">
             <div class="metric-card">
-              <div class="metric-label">Registered companies</div>
+              <div class="metric-label">Companies in database</div>
               <div class="metric-value-row">
                 <div class="metric-value" id="metric-companies">28</div>
                 <div class="metric-chip">Goal: 30</div>
               </div>
               <div class="metric-trend" id="metric-companies-trend">
-                +4 since last check
+                Sample data
               </div>
             </div>
 
             <div class="metric-card">
-              <div class="metric-label">Tables assigned</div>
+              <div class="metric-label">Table assignments</div>
               <div class="metric-value-row">
                 <div class="metric-value" id="metric-tables-assigned">22</div>
                 <div class="metric-chip" id="metric-tables-free">10 free</div>
               </div>
-              <div class="metric-trend">Layout ~69% utilized</div>
+              <div class="metric-trend">Table assignment info</div>
             </div>
 
             <div class="metric-card">
@@ -138,16 +136,16 @@
                 <div class="metric-value" id="metric-sponsors">6</div>
                 <div class="metric-chip">Gold &amp; Silver</div>
               </div>
-              <div class="metric-trend">Sponsor map up to date</div>
+              <div class="metric-trend">Sponsor info</div>
             </div>
 
             <div class="metric-card">
-              <div class="metric-label">Resumes uploaded</div>
+              <div class="metric-label">Majors linked</div>
               <div class="metric-value-row">
                 <div class="metric-value" id="metric-resumes">83</div>
-                <div class="metric-chip">Students &amp; alumni</div>
+                <div class="metric-chip">Majors linked</div>
               </div>
-              <div class="metric-trend">+11 in last 24 hours</div>
+              <div class="metric-trend">Distinct majors connected</div>
             </div>
           </div>
 
@@ -156,9 +154,9 @@
             <div class="card card-alt">
               <div class="card-header">
                 <div>
-                  <div class="card-title">Hall A overview</div>
+                  <div class="card-title">Room overview</div>
                   <div class="card-subtitle">
-                    Tables, aisles, and walls — scaled-down view.
+                    Tables, aisles, and walls using the current layout data.
                   </div>
                 </div>
 
@@ -184,7 +182,7 @@
             <div class="card">
               <div class="card-header">
                 <div>
-                  <div class="card-title">Demo checklist</div>
+                  <div class="card-title">Checklist</div>
                   <div class="card-subtitle">
                     Steps you can walk through live in your presentation.
                   </div>
@@ -204,19 +202,20 @@
         </section>
 
         <!-- COMPANIES VIEW -->
+        <!-- Companies view -->
         <section class="view" id="view-companies">
           <div class="view-heading-row">
             <div>
               <div class="view-title">Companies &amp; Tables</div>
               <div class="view-subtitle">
-                Registrations, table assignments, and sponsor status.
+                Companies, tables, sponsors, majors, positions.
               </div>
             </div>
 
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button class="button-ghost" id="btn-clear-filters">
                 <span class="button-icon">✕</span>
-                <span>Clear filters</span>
+                <span>Reset sample data</span>
               </button>
             </div>
           </div>
@@ -227,7 +226,7 @@
                 <div>
                   <div class="card-title">Registered companies</div>
                   <div class="card-subtitle">
-                    Assign companies to tables here or via drag &amp; drop on the map.
+                    Joined company, table assignments, sponsors, majors, and positions.
                   </div>
                 </div>
 
@@ -249,10 +248,11 @@
                   <thead>
                     <tr>
                       <th>Company</th>
-                      <th>Industry</th>
-                      <th>Table</th>
-                      <th>Sponsor</th>
-                      <th>Actions</th>
+                      <th>Website</th>
+                      <th>Table (room / row / col)</th>
+                      <th>Sponsor level</th>
+                      <th>Majors &amp; roles</th>
+                      <th>Visa</th>
                     </tr>
                   </thead>
                   <tbody id="companies-table-body"></tbody>
@@ -260,70 +260,24 @@
               </div>
             </div>
 
-            <div class="card">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">Add or update company</div>
-                  <div class="card-subtitle">
-                    For the demo, this stores data in memory only.
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-grid">
-                <div class="field">
-                  <label for="company-name">Company name</label>
-                  <input id="company-name" placeholder="e.g., BlueShift Robotics" />
-                </div>
-
-                <div class="field">
-                  <label for="company-industry">Industry</label>
-                  <input id="company-industry" placeholder="e.g., Software, Manufacturing" />
-                </div>
-
-                <div class="field">
-                  <label for="company-table">Table number</label>
-                  <select id="company-table">
-                    <option value="">Unassigned</option>
-                  </select>
-                </div>
-
-                <div class="field">
-                  <label for="company-sponsor">Sponsor tier</label>
-                  <select id="company-sponsor">
-                    <option value="none">None</option>
-                    <option value="gold">Gold</option>
-                    <option value="silver">Silver</option>
-                  </select>
-                </div>
-              </div>
-
-              <button class="button-primary" id="btn-save-company">
-                <span class="button-icon">➕</span>
-                <span>Save company</span>
-              </button>
-
-              <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
-                Later, this can call your backend API (e.g., NestJS/Express) instead of staying in memory.
-              </div>
-            </div>
           </div>
         </section>
 
         <!-- LAYOUT & MAP VIEW -->
+        <!-- Layout view -->
         <section class="view" id="view-layout">
           <div class="view-heading-row">
             <div>
               <div class="view-title">Layout &amp; Map</div>
               <div class="view-subtitle">
-                Walls, aisles, tables, and safety constraints with drag &amp; drop.
+                Rooms and table_assignments visualized with drag &amp; drop.
               </div>
             </div>
 
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button class="button-ghost">
                 <span class="button-icon">🖨️</span>
-                <span>Export map (demo)</span>
+                <span>Export map</span>
               </button>
             </div>
           </div>
@@ -333,9 +287,9 @@
             <div class="card card-alt">
               <div class="card-header">
                 <div>
-                  <div class="card-title">Hall A map</div>
+                  <div class="card-title">Room layout</div>
                   <div class="card-subtitle">
-                    Students walk aisles between rows; doors and exits on the walls.
+                    Uses row_letter / column_num plus the first room in the rooms table.
                   </div>
                 </div>
 
@@ -397,18 +351,19 @@
         </section>
 
         <!-- RESUMES VIEW -->
+        <!-- Resumes view -->
         <section class="view" id="view-resumes">
           <div class="view-heading-row">
             <div>
               <div class="view-title">Resumes</div>
               <div class="view-subtitle">
-                Demo list of uploaded student resumes by company.
+                Uploaded student resumes by company.
               </div>
             </div>
 
             <button class="button-ghost">
               <span class="button-icon">⬆</span>
-              <span>Upload test resume</span>
+              <span>Upload resume</span>
             </button>
           </div>
 
@@ -418,7 +373,7 @@
                 <div>
                   <div class="card-title">Recently uploaded resumes</div>
                   <div class="card-subtitle">
-                    Later, this will connect to secure storage (e.g., S3).
+                    Stored in secure storage.
                   </div>
                 </div>
               </div>
@@ -429,7 +384,7 @@
             <div class="card">
               <div class="card-header">
                 <div>
-                  <div class="card-title">Demo talking points</div>
+                  <div class="card-title">Talking points</div>
                   <div class="card-subtitle">
                     How recruiters interact with resumes during the fair.
                   </div>
@@ -437,10 +392,10 @@
               </div>
 
               <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:6px;">
-                <li>• Students upload resumes ahead of time in the student app.</li>
-                <li>• Files are stored in cloud storage with access control.</li>
-                <li>• Recruiters filter by company, major, graduation date, etc.</li>
-                <li>• Everything is driven by the backend you’re building.</li>
+                <li>Students upload resumes ahead of time.</li>
+                <li>Files stay in controlled storage.</li>
+                <li>Recruiters filter by company, major, and graduation date.</li>
+                <li>The backend can power these actions.</li>
               </ul>
             </div>
           </div>
@@ -453,3 +408,17 @@
   <script src="admin.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
