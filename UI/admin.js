@@ -5,6 +5,7 @@
 
 const DEFAULT_ROW_LETTERS = ["A", "B", "C", "D"];
 const DEFAULT_COLUMN_COUNT = 8;
+const clamp01 = (value) => Math.min(Math.max(value, 0), 1);
 
 const sampleData = {
   rooms: [{ room_id: 1, room_name: "Junker Hall A" }],
@@ -135,6 +136,10 @@ const sampleData = {
   ],
 };
 
+/**
+ * Generates a default grid when no backend data is available.
+ * Keeps the layout predictable across environments.
+ */
 function createDefaultTables(rowLetters = DEFAULT_ROW_LETTERS, columnCount = DEFAULT_COLUMN_COUNT, roomName = "Main hall") {
   return rowLetters.flatMap((rowLetter) =>
     Array.from({ length: columnCount }).map((_, colIndex) => {
@@ -161,16 +166,16 @@ let companies = [];
 
 let resumes = [];
 
-function createEmptyWallSegments(columnCount = DEFAULT_COLUMN_COUNT) {
-  const buildRow = (prefix) =>
-    Array.from({ length: columnCount }).map((_, i) => ({
-      id: `${prefix}-${i}`,
-      constraints: [],
-    }));
-
+/**
+ * Creates blank wall collections for each side of the room.
+ * Each constraint placed on the wall stores its type + offset.
+ */
+function createEmptyWallSegments() {
   return {
-    top: buildRow("top"),
-    bottom: buildRow("bottom"),
+    top: [],
+    bottom: [],
+    left: [],
+    right: [],
   };
 }
 
@@ -195,6 +200,7 @@ const backendConfig =
     resumesUrl: null,
   };
 
+// Fetch helper so future integrations can plug in APIs
 async function fetchSection(url) {
   if (!url || typeof fetch !== "function") return null;
   const response = await fetch(url);
@@ -204,6 +210,9 @@ async function fetchSection(url) {
   return response.json();
 }
 
+/**
+ * Re-shapes backend-provided tables into the lightweight front-end structure.
+ */
 function normalizeTables(rawTables) {
   if (!Array.isArray(rawTables) || !rawTables.length) {
     return createDefaultTables(gridConfig.rowLetters, gridConfig.columnCount);
@@ -227,40 +236,68 @@ function normalizeTables(rawTables) {
   }));
 }
 
-function normalizeWallSegments(
-  rawSegments,
-  columnCount = gridConfig.columnCount || DEFAULT_COLUMN_COUNT
-) {
-  if (!rawSegments || !rawSegments.top || !rawSegments.bottom) {
-    return createEmptyWallSegments(columnCount);
+/**
+ * Maps stored wall metadata into evenly sized arrays so the UI can render slots.
+ */
+function normalizeWallSegments(rawSegments) {
+  const normalized = createEmptyWallSegments();
+  if (!rawSegments || typeof rawSegments !== "object") {
+    return normalized;
   }
 
-  return {
-    top: Array.from({ length: columnCount }).map((_, index) => {
-      const segment = rawSegments.top[index] || {};
-      return {
-        id: segment.id || `top-${index}`,
-        constraints: Array.isArray(segment.constraints)
-          ? [...segment.constraints]
-          : [],
-      };
-    }),
-    bottom: Array.from({ length: columnCount }).map((_, index) => {
-      const segment = rawSegments.bottom[index] || {};
-      return {
-        id: segment.id || `bottom-${index}`,
-        constraints: Array.isArray(segment.constraints)
-          ? [...segment.constraints]
-          : [],
-      };
-    }),
+  const mapLegacySegments = (side) => {
+    const sideSegments = rawSegments[side];
+    if (!sideSegments) return;
+
+    // Legacy format: array of segments with constraints arrays
+    if (
+      Array.isArray(sideSegments) &&
+      sideSegments.some((segment) => Array.isArray(segment?.constraints))
+    ) {
+      const length = sideSegments.length || 1;
+      sideSegments.forEach((segment, index) => {
+        (segment?.constraints || []).forEach((type, constraintIndex) => {
+          if (!type) return;
+          normalized[side].push({
+            id: `${segment?.id || `${side}-${index}`}-${constraintIndex}`,
+            type,
+            offset: clamp01((index + 0.5) / length),
+          });
+        });
+      });
+      return;
+    }
+
+    // Modern format: array of objects with type + offset
+    if (Array.isArray(sideSegments)) {
+      sideSegments.forEach((item, index) => {
+        if (!item || (!item.type && !item.constraintType)) return;
+        const type = item.type || item.constraintType;
+        normalized[side].push({
+          id: item.id || `${side}-${index}`,
+          type,
+          offset: clamp01(
+            typeof item.offset === "number"
+              ? item.offset
+              : (index + 1) / (sideSegments.length + 1)
+          ),
+        });
+      });
+    }
   };
+
+  ["top", "bottom", "left", "right"].forEach(mapLegacySegments);
+  return normalized;
 }
 
-function ensureWallSegments(columnCount = gridConfig.columnCount) {
-  wallSegments = normalizeWallSegments(wallSegments, columnCount);
+// Guarantee we always have enough wall slots for drag targets
+function ensureWallSegments() {
+  wallSegments = normalizeWallSegments(wallSegments);
 }
 
+/**
+ * Reads the assignment data to determine which row labels should exist.
+ */
 function deriveRowLetters(assignments) {
   const letters = Array.from(
     new Set(
@@ -273,6 +310,9 @@ function deriveRowLetters(assignments) {
   return letters.length ? letters : DEFAULT_ROW_LETTERS;
 }
 
+/**
+ * Builds out the entire seating grid from joined assignment data.
+ */
 function buildTablesFromData(data) {
   const assignments = Array.isArray(data?.table_assignments)
     ? data.table_assignments
@@ -290,6 +330,7 @@ function buildTablesFromData(data) {
     };
 
   const assignmentMap = new Map();
+  // Fast lookup so we can map (row, column) to assignments during grid creation
   assignments.forEach((assignment) => {
     const key = `${assignment.room_id || room.room_id}-${(assignment.row_letter || "")
       .toString()
@@ -297,6 +338,7 @@ function buildTablesFromData(data) {
     assignmentMap.set(key, assignment);
   });
 
+  // Generate every row/column combination so empty tables still render
   const tablesFromData = rowLetters.flatMap((rowLetter) =>
     Array.from({ length: columnCount }).map((_, colIndex) => {
       const columnNum = colIndex + 1;
@@ -325,6 +367,9 @@ function buildTablesFromData(data) {
   };
 }
 
+/**
+ * Joins together tables, sponsor tiers, majors, and titles into company objects.
+ */
 function buildCompaniesFromData(data, tablesFromData) {
   const sponsorMap = new Map(
     (data?.sponsor_levels || []).map((level) => [
@@ -342,6 +387,7 @@ function buildCompaniesFromData(data, tablesFromData) {
     (data?.position_titles || []).map((title) => [title.title_id, title.title_name])
   );
 
+  // Map relational tables to arrays keyed by company id
   const majorsByCompany = new Map();
   (data?.company_majors || []).forEach((entry) => {
     const majorName = majorsMap.get(entry.major_id);
@@ -366,6 +412,7 @@ function buildCompaniesFromData(data, tablesFromData) {
     titlesByCompany.set(entry.comp_id, [...existing, titleName]);
   });
 
+  // Keep track of which table belongs to which company
   const tableByCompany = new Map();
   tablesFromData.forEach((table) => {
     if (table.companyId) {
@@ -409,6 +456,7 @@ function buildCompaniesFromData(data, tablesFromData) {
   });
 }
 
+// Update the grid dimensions once we know how many rows/columns exist
 function applyGridConfigFromTables(tableSet) {
   const rowLetters = Array.from(
     new Set(tableSet.map((table) => table.rowLetter).filter(Boolean))
@@ -423,18 +471,24 @@ function applyGridConfigFromTables(tableSet) {
     columnCount: columnCount || DEFAULT_COLUMN_COUNT,
   };
 
-  ensureWallSegments(gridConfig.columnCount);
+  ensureWallSegments();
 }
 
+/**
+ * Seeds the UI with bundled sample data so the demo works offline.
+ */
 function seedFromSample(data = sampleData) {
   const built = buildTablesFromData(data);
   tables = built.tables;
   applyGridConfigFromTables(tables);
-  wallSegments = createEmptyWallSegments(gridConfig.columnCount);
+  wallSegments = createEmptyWallSegments();
   companies = buildCompaniesFromData(data, tables);
   resumes = [];
 }
 
+/**
+ * Converts arbitrary company data into the normalized format used by rendering layers.
+ */
 function normalizeCompanies(rawCompanies) {
   if (!Array.isArray(rawCompanies)) return [];
 
@@ -457,6 +511,7 @@ function normalizeCompanies(rawCompanies) {
   }));
 }
 
+// Resumes are flattened into simple cards for the Resumes view
 function normalizeResumes(rawResumes) {
   if (!Array.isArray(rawResumes)) return [];
 
@@ -469,6 +524,10 @@ function normalizeResumes(rawResumes) {
   }));
 }
 
+/**
+ * Writes table/company relationships back to each entity
+ * so drag-and-drop renders consistent details everywhere.
+ */
 function syncTableAssignments() {
   tables.forEach((table) => {
     table.companyId = null;
@@ -549,6 +608,7 @@ const sidebarEl = document.getElementById("sidebar");
 const sidebarBackdrop = document.getElementById("sidebar-backdrop");
 const topbarMenuButton = document.getElementById("topbar-menu-button");
 
+// Simple helpers keep the sidebar toggling logic tidy
 function openSidebar() {
   sidebarEl.classList.add("open");
   sidebarBackdrop.classList.add("visible");
@@ -580,6 +640,9 @@ const layoutTotalTablesEl = document.getElementById("layout-total-tables");
 /**
  * Helper: constraint metadata
  */
+/**
+ * Helper to map a constraint type into a friendly label/icon set.
+ */
 function getConstraintMeta(type) {
   return constraintTypes.find((c) => c.type === type) || null;
 }
@@ -588,6 +651,9 @@ function getConstraintMeta(type) {
  * Build the full map for the Layout view (walls + tables + aisles).
  * compact = false → full map
  * compact = true  → simplified grid for dashboard
+ */
+/**
+ * Renders all table cells and wall segments for the dashboard + layout views.
  */
 function renderGridCells(container, compact) {
   container.innerHTML = "";
@@ -601,7 +667,7 @@ function renderGridCells(container, compact) {
     tables.reduce((max, table) => Math.max(max, table.columnNum || 0), 0) ||
     DEFAULT_COLUMN_COUNT;
 
-  ensureWallSegments(columnCount);
+  ensureWallSegments();
 
   const findTable = (rowLetter, columnIndex) =>
     tables.find(
@@ -618,52 +684,56 @@ function renderGridCells(container, compact) {
       roomName: tables[0]?.roomName || "Room",
     };
 
+  const room = document.createElement("div");
+  room.className = "map-room";
   if (compact) {
-    rowLetters.forEach((rowLetter) => {
-      const rowDiv = document.createElement("div");
-      rowDiv.className = "map-row";
-      for (let col = 1; col <= columnCount; col++) {
-        const table = findTable(rowLetter, col);
-        const cell = createTableCell(table, true);
-        rowDiv.appendChild(cell);
-      }
-      container.appendChild(rowDiv);
-    });
-    return;
+    room.classList.add("map-room-compact");
   }
 
-  // FULL MAP for Layout view:
-
-  // TOP WALL ROW (hallway / entrance side)
-  const topRow = document.createElement("div");
-  topRow.className = "map-row map-row-wall";
-  for (let col = 0; col < columnCount; col++) {
-    const cell = createWallCell("top", col);
-    topRow.appendChild(cell);
+  const grid = document.createElement("div");
+  grid.className = "map-grid";
+  if (compact) {
+    grid.classList.add("map-grid-compact");
   }
-  container.appendChild(topRow);
 
-  // Table rows with aisles between them
+  const walkwayAfter = Math.max(1, Math.floor(columnCount / 2));
+  const appendWalkwaySpacer = (rowElement, isAisle) => {
+    const walkway = document.createElement("div");
+    walkway.className = "map-walkway-spacer" + (isAisle ? " walkway-aisle" : "");
+    if (compact) {
+      walkway.classList.add("compact");
+    }
+    rowElement.appendChild(walkway);
+  };
+
   rowLetters.forEach((rowLetter, rowIndex) => {
     const tableRow = document.createElement("div");
     tableRow.className = "map-row";
+    tableRow.style.setProperty("--map-columns", columnCount + 1);
+    let walkwayInserted = false;
     for (let col = 1; col <= columnCount; col++) {
       const table = findTable(rowLetter, col);
-      const cell = createTableCell(table, false);
+      const cell = createTableCell(table, compact);
       tableRow.appendChild(cell);
+      if (!walkwayInserted && col === walkwayAfter) {
+        appendWalkwaySpacer(tableRow, false);
+        walkwayInserted = true;
+      }
     }
-    container.appendChild(tableRow);
+    if (!walkwayInserted) {
+      appendWalkwaySpacer(tableRow, false);
+    }
+    grid.appendChild(tableRow);
 
-    // Aisle row between rows (not after last row)
     if (rowIndex !== rowLetters.length - 1) {
       const aisleRow = document.createElement("div");
       aisleRow.className = "map-row map-row-aisle";
-      for (let c = 0; c < columnCount; c++) {
+      aisleRow.style.setProperty("--map-columns", columnCount + 1);
+      let aisleWalkwayInserted = false;
+      for (let col = 1; col <= columnCount; col++) {
         const aisleCell = document.createElement("div");
         aisleCell.className = "map-aisle-cell";
-
-        // Just label a couple of cells so it looks like a walkway
-        if (c === 3 || c === 4) {
+        if (col === Math.ceil(columnCount / 2)) {
           const label = document.createElement("div");
           label.className = "map-aisle-label";
           label.textContent = "Aisle";
@@ -671,25 +741,27 @@ function renderGridCells(container, compact) {
         }
 
         aisleRow.appendChild(aisleCell);
+        if (!aisleWalkwayInserted && col === walkwayAfter) {
+          appendWalkwaySpacer(aisleRow, true);
+          aisleWalkwayInserted = true;
+        }
       }
-      container.appendChild(aisleRow);
+      if (!aisleWalkwayInserted) {
+        appendWalkwaySpacer(aisleRow, true);
+      }
+      grid.appendChild(aisleRow);
     }
   });
 
-  // BOTTOM WALL ROW
-  const bottomRow = document.createElement("div");
-  bottomRow.className = "map-row map-row-wall";
-  for (let col = 0; col < columnCount; col++) {
-    const cell = createWallCell("bottom", col);
-    bottomRow.appendChild(cell);
-  }
-  container.appendChild(bottomRow);
+  room.appendChild(grid);
+
+  ["top", "bottom", "left", "right"].forEach((side) => {
+    room.appendChild(createWallEdge(side));
+  });
+
+  container.appendChild(room);
 }
 
-/**
- * Create a single table cell (the squares students walk between).
- * compact = true → used on dashboard, no drag/drop
- */
 function createTableCell(table, compact) {
   const company = companies.find((c) => c.id === table.companyId) || null;
 
@@ -733,69 +805,64 @@ function createTableCell(table, compact) {
   return cell;
 }
 
-/**
- * Create a cell for the walls; constraints (doors, etc.) go here.
- * side = "top" | "bottom"
- */
-function createWallCell(side, index) {
-  const segment =
-    (wallSegments[side] && wallSegments[side][index]) || {
-      id: `${side}-${index}`,
-      constraints: [],
-    };
-  const cell = document.createElement("div");
-  cell.className = "map-wall-cell";
+function createWallEdge(side) {
+  const edge = document.createElement("div");
+  edge.className = `map-wall-edge map-wall-${side}`;
+  edge.dataset.side = side;
 
-  const label = document.createElement("div");
-  label.className = "map-wall-label";
-  const midpoint = Math.floor(
-    ((wallSegments[side] || []).length - 1) / 2
-  );
+  const items = wallSegments[side] || [];
+  items.forEach((item) => {
+    const meta = getConstraintMeta(item.type);
+    if (!meta) return;
+    const chip = document.createElement("div");
+    chip.className =
+      "map-wall-item " +
+      (side === "top" || side === "bottom" ? "horizontal" : "vertical");
+    chip.textContent = meta.short;
+    chip.draggable = true;
+    chip.tabIndex = 0;
+    chip.title = "Drag to move or double-click to remove";
 
-  // Give the middle segments names so it reads like a real room
-  if (side === "top" && index === midpoint) {
-    label.textContent = "Entrance";
-  } else if (side === "bottom" && index === midpoint) {
-    label.textContent = "Exit";
-  } else if (index === 0) {
-    label.textContent = side === "top" ? "North wall" : "South wall";
-  } else {
-    label.textContent = "";
-  }
+    if (side === "top" || side === "bottom") {
+      chip.style.left = `${clamp01(item.offset) * 100}%`;
+      chip.style.top = "50%";
+    } else {
+      chip.style.top = `${clamp01(item.offset) * 100}%`;
+      chip.style.left = "50%";
+    }
 
-  cell.appendChild(label);
+    chip.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("type", "constraint");
+      e.dataTransfer.setData("constraintType", item.type);
+      e.dataTransfer.setData("constraintId", item.id);
+      e.dataTransfer.setData("constraintSourceSide", side);
+    });
 
-  if (segment.constraints.length) {
-    const constraintsEl = document.createElement("div");
-    constraintsEl.className = "map-wall-constraints";
+    chip.addEventListener("dblclick", () => {
+      removeConstraintFromWall(item.id, side);
+    });
 
-    const shortLabels = segment.constraints
-      .map((type) => {
-        const meta = getConstraintMeta(type);
-        return meta ? meta.short : type;
-      })
-      .join(" ");
+    edge.appendChild(chip);
+  });
 
-    constraintsEl.textContent = shortLabels;
-    cell.appendChild(constraintsEl);
-  }
-
-  // Drag-over: only for constraints
-  cell.addEventListener("dragover", (e) => {
+  edge.addEventListener("dragover", (e) => {
     e.preventDefault();
   });
 
-  cell.addEventListener("drop", (e) => {
+  edge.addEventListener("drop", (e) => {
     e.preventDefault();
-    handleDropOnWall(e, side, index);
+    handleDropOnWall(e, side);
   });
 
-  return cell;
+  return edge;
 }
 
 /**
  * Show details in the side panel when a table is selected.
  * Also adds sponsor toggle + "Unassign table" button.
+ */
+/**
+ * Populates the inspector panel whenever a table is selected.
  */
 function showTableDetails(table) {
   const company = companies.find((c) => c.id === table.companyId) || null;
@@ -894,6 +961,9 @@ function showTableDetails(table) {
 /**
  * Handle drops on tables: ONLY companies here.
  */
+/**
+ * Handles all drag-n-drop interactions that target a table.
+ */
 function handleDropOnTable(e, table) {
   const dropType = e.dataTransfer.getData("type");
   if (dropType !== "company") return; // constraints not accepted on tables
@@ -933,20 +1003,56 @@ function handleDropOnTable(e, table) {
 /**
  * Handle drops on walls: constraints ONLY (doors, extinguishers, exits).
  */
-function handleDropOnWall(e, side, index) {
+// Allows constraint chips to land anywhere along the wall rails
+function handleDropOnWall(e, side) {
   const dropType = e.dataTransfer.getData("type");
   if (dropType !== "constraint") return;
 
   const constraintType = e.dataTransfer.getData("constraintType");
   if (!constraintType) return;
 
-  const segment =
-    (wallSegments[side] && wallSegments[side][index]) ||
-    (wallSegments[side][index] = { id: `${side}-${index}`, constraints: [] });
-  if (!segment.constraints.includes(constraintType)) {
-    segment.constraints.push(constraintType);
+  const targetRect = e.currentTarget.getBoundingClientRect();
+  let offset;
+  if (side === "top" || side === "bottom") {
+    offset = (e.clientX - targetRect.left) / targetRect.width;
+  } else {
+    offset = (e.clientY - targetRect.top) / targetRect.height;
   }
 
+  const existingId = e.dataTransfer.getData("constraintId");
+  const sourceSide = e.dataTransfer.getData("constraintSourceSide");
+
+  if (existingId && sourceSide && wallSegments[sourceSide]) {
+    wallSegments[sourceSide] = wallSegments[sourceSide].filter(
+      (item) => item.id !== existingId
+    );
+  }
+
+  const entry = {
+    id: existingId || `${side}-${Date.now()}`,
+    type: constraintType,
+    offset: clamp01(offset || 0),
+  };
+
+  const currentList = Array.isArray(wallSegments[side]) ? wallSegments[side] : [];
+  wallSegments[side] = [
+    ...currentList.filter((item) => item.id !== entry.id),
+    entry,
+  ];
+
+  renderGridCells(layoutGridEl, false);
+  renderGridCells(dashboardLayoutGridEl, true);
+}
+
+function removeConstraintFromWall(constraintId, side) {
+  if (!constraintId || !wallSegments[side]) return;
+  const before = wallSegments[side].length;
+  wallSegments[side] = wallSegments[side].filter(
+    (item) => item.id !== constraintId
+  );
+  if (wallSegments[side].length === before) {
+    return;
+  }
   renderGridCells(layoutGridEl, false);
   renderGridCells(dashboardLayoutGridEl, true);
 }
@@ -954,6 +1060,7 @@ function handleDropOnWall(e, side, index) {
 /**
  * Unassign a company from a table (table becomes free).
  */
+// Utility to clear assignments without losing the original table
 function unassignTable(table, company) {
   if (!table || !company) return;
 
@@ -986,6 +1093,9 @@ const companiesAssignedEl = document.getElementById("companies-assigned");
 const companiesSponsorsEl = document.getElementById("companies-sponsors");
 /**
  * Render company table (list) with badges at the top.
+ */
+/**
+ * Draws the detailed company table listing on the Companies view.
  */
 function renderCompanyTable() {
   companiesTableBody.innerHTML = "";
@@ -1080,6 +1190,7 @@ function renderCompanyTable() {
   companiesSponsorsEl.textContent = String(sponsorCount);
 }
 
+// Quick way to reload the bundled sample data set
 function resetToSampleSeed() {
   seedFromSample(sampleData);
   syncTableAssignments();
@@ -1101,6 +1212,9 @@ const constraintPaletteEl = document.getElementById("constraint-palette");
 
 /**
  * Companies palette: drag these onto tables.
+ */
+/**
+ * Populates the draggable company chips next to the layout editor.
  */
 function renderCompanyPalette() {
   companyPaletteEl.innerHTML = "";
@@ -1127,6 +1241,7 @@ function renderCompanyPalette() {
 /**
  * Constraints palette: doors, extinguishers, exits, walls only.
  */
+// Populates the simple constraint chips (doors, exits, etc.)
 function renderConstraintPalette() {
   constraintPaletteEl.innerHTML = "";
   constraintTypes.forEach((c) => {
@@ -1152,6 +1267,9 @@ function renderConstraintPalette() {
 
 const resumeListEl = document.getElementById("resume-list");
 
+/**
+ * Rebuilds the resume list with the latest normalized data.
+ */
 function renderResumes() {
   resumeListEl.innerHTML = "";
   resumes.forEach((resume) => {
@@ -1206,6 +1324,7 @@ function renderResumes() {
   });
 }
 
+// Runs every render function so the UI stays in sync
 function renderAllViews() {
   renderGridCells(layoutGridEl, false);
   renderGridCells(dashboardLayoutGridEl, true);
@@ -1240,6 +1359,9 @@ const metricSponsors = document.getElementById("metric-sponsors");
 const metricResumes = document.getElementById("metric-resumes");
 const refreshStatsButton = document.getElementById("btn-refresh-stats");
 
+/**
+ * Refreshes the top-level stats shown on the Dashboard cards.
+ */
 function renderMetrics() {
   const companyCount = companies.length;
   const tablesAssigned = tables.filter((t) => t.companyId).length;

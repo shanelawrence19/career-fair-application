@@ -10,12 +10,12 @@
 </head>
 <body>
   <!-- Simple admin layout for career fair data -->
-  <!-- Backdrop for mobile sidebar -->
+  <!-- Backdrop for mobile sidebar toggled on mobile to keep focus on the nav -->
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
   <!-- Page shell wraps sidebar and main content -->
   <div class="app-shell">
-    <!-- Sidebar navigation -->
+    <!-- Sidebar navigation keeps all primary views reachable -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div>
@@ -25,6 +25,7 @@
       </div>
 
       <div>
+        <!-- Overview links keep the primary dashboard accessible -->
         <div class="sidebar-section-label">Overview</div>
         <div class="sidebar-nav-group">
           <button class="sidebar-button active" data-view-target="view-dashboard">
@@ -35,6 +36,7 @@
       </div>
 
       <div>
+        <!-- Navigation for the three main admin tools -->
         <div class="sidebar-section-label">Career Fair</div>
         <div class="sidebar-nav-group">
           <button class="sidebar-button" data-view-target="view-companies">
@@ -59,7 +61,7 @@
       </div>
     </aside>
 
-    <!-- MAIN AREA -->
+    <!-- MAIN AREA contains the header and the various views -->
     <main class="main">
       <!-- Top bar with title and quick actions -->
       <header class="topbar">
@@ -76,6 +78,7 @@
 
         <div class="topbar-spacer"></div>
 
+        <!-- Utility chips surface live state and actions -->
         <div class="topbar-chip-row">
           <div class="pill-soft">
             <span class="dot-green"></span>
@@ -109,6 +112,7 @@
             </button>
           </div>
 
+          <!-- Stat cards summarize the health of the fair -->
           <div class="metrics-row">
             <div class="metric-card">
               <div class="metric-label">Companies in database</div>
@@ -149,6 +153,7 @@
             </div>
           </div>
 
+          <!-- Individual widgets below highlight deeper data -->
           <div class="layout">
             <!-- Mini map -->
             <div class="card card-alt">
@@ -168,13 +173,13 @@
               </div>
 
               <div class="map-frame map-frame-small">
-                <div class="map-grid" id="dashboard-layout-grid"></div>
+                <div class="map-canvas" id="dashboard-layout-grid"></div>
               </div>
 
               <div class="horizontal-row map-legend">
                 <div class="badge badge-soft">Blue = assigned table</div>
                 <div class="badge badge-soft">Gold = sponsor table</div>
-                <div class="badge">🚪 Door • 🧯 Extinguisher • 🟩 Exit on walls</div>
+                <div class="badge">🚪 Door • 🧯 Extinguisher • 🟩 Exit along walls</div>
               </div>
             </div>
 
@@ -220,6 +225,8 @@
             </div>
           </div>
 
+          <!-- Each column groups table data with quick stats -->
+          <!-- Resumes view mirrors the dashboard columns for consistency -->
           <div class="layout">
             <div class="card card-alt">
               <div class="card-header">
@@ -243,6 +250,7 @@
                 </div>
               </div>
 
+              <!-- Table below lists every company record -->
               <div class="table-wrap scroll-y">
                 <table>
                   <thead>
@@ -295,7 +303,7 @@
 
                 <div class="horizontal-row">
                   <div class="badge badge-soft">Drag companies onto tables</div>
-                  <div class="badge badge-soft">Drag 🚪 / 🧯 / 🟩 onto walls</div>
+                  <div class="badge badge-soft">Drop 🚪 / 🧯 / 🟩 anywhere along the border, drag again to move, double-click to remove</div>
                   <div class="badge">
                     Total tables: <span id="layout-total-tables">0</span>
                   </div>
@@ -304,12 +312,13 @@
 
               <div class="map-frame">
                 <!-- Entrances, aisles, and tables rendered here -->
-                <div class="map-grid" id="layout-grid"></div>
+                <div class="map-canvas" id="layout-grid"></div>
               </div>
 
               <div class="map-helper-text">
-                Top wall: hallway / entrance. Aisles run horizontally between table rows so
-                students can move through the room.
+                Drag doors, extinguishers, and exits directly onto any wall edge. Double-click an icon
+                to remove it or drag again to reposition. Aisles run horizontally so students can move
+                through the room.
               </div>
             </div>
 
@@ -341,7 +350,7 @@
                 <div class="palette-section">
                   <div class="palette-title">Map constraints</div>
                   <div class="palette-subtitle">
-                    Drag onto walls only (doors, fire extinguishers, exits).
+                    Drag onto any wall edge to place doors, exits, or extinguishers.
                   </div>
                   <div id="constraint-palette" class="palette-list"></div>
                 </div>
@@ -378,6 +387,7 @@
                 </div>
               </div>
 
+              <!-- Resume entries get rendered here by admin.js -->
               <div class="resume-list" id="resume-list"></div>
             </div>
 
@@ -391,6 +401,7 @@
                 </div>
               </div>
 
+              <!-- Quick talking points for demo conversations -->
               <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:6px;">
                 <li>Students upload resumes ahead of time.</li>
                 <li>Files stay in controlled storage.</li>

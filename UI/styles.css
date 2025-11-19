@@ -1,27 +1,28 @@
 /* =========
-   PENN STATE–STYLE THEME
+   PENN STATE STYLE THEME
    ========= */
 
 /* Basic color tokens for a simple, clean look */
 :root {
-  --blue-dark: #1f2937;
-  --blue-main: #2563eb;
-  --blue-light: #f3f4f6;
-  --accent: #2563eb;
-  --accent-soft: #e5e7eb;
+  /* Penn State inspired palette */
+  --blue-dark: #041e42;
+  --blue-main: #0c3c78;
+  --blue-light: #e7effb;
+  --accent: #00a3e0;
+  --accent-soft: #b9d6f2;
 
-  --bg-main: #f9fafb;
+  --bg-main: #f5f7fb;
   --bg-card: #ffffff;
-  --border-subtle: #e5e7eb;
+  --border-subtle: #d3dae8;
 
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --danger: #b91c1c;
-  --success: #15803d;
+  --text-main: #0f172a;
+  --text-muted: #51617e;
+  --danger: #9b1c1c;
+  --success: #0f7a3a;
 
-  --radius-lg: 8px;
+  --radius-lg: 6px;
   --radius-pill: 999px;
-  --shadow-soft: 0 4px 10px rgba(17, 24, 39, 0.05);
+  --shadow-soft: 0 1px 3px rgba(4, 30, 66, 0.1);
 
   --transition-fast: 120ms ease-out;
   --transition-med: 160ms ease-out;
@@ -94,15 +95,15 @@ body {
    SIDEBAR
    ========= */
 /* Styles for the left navigation */
+/* Sidebar stays intentionally flat to reinforce the simplified style */
 
 .sidebar {
-  background: #ffffff;
+  background: #f8f9fd;
   border-right: 1px solid var(--border-subtle);
   padding: 20px 18px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  box-shadow: 2px 0 10px rgba(15, 23, 42, 0.05);
+  gap: 20px;
   transition: transform var(--transition-med);
 }
 
@@ -154,6 +155,7 @@ body {
   gap: 4px;
 }
 
+/* Navigation buttons read as simple text pills */
 .sidebar-button {
   display: flex;
   align-items: center;
@@ -172,13 +174,13 @@ body {
 .sidebar-button:hover {
   background: var(--blue-light);
   color: var(--blue-dark);
-  border-color: #cdd5e5;
+  border-color: var(--accent-soft);
 }
 
 .sidebar-button.active {
-  background: var(--blue-main);
+  background: var(--blue-dark);
   color: #ffffff;
-  border-color: var(--blue-main);
+  border-color: var(--blue-dark);
 }
 
 .sidebar-button-icon {
@@ -188,7 +190,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--blue-light);
   font-size: 13px;
   color: var(--blue-main);
 }
@@ -238,11 +240,13 @@ body {
   display: flex;
   align-items: center;
   gap: 18px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: #ffffff;
+  border-bottom: none;
+  background: var(--blue-dark);
   position: sticky;
   top: 0;
   z-index: 10;
+  color: #f8fafc;
+  box-shadow: 0 2px 12px rgba(4, 30, 66, 0.3);
 }
 
 .topbar-menu-button {
@@ -250,9 +254,9 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 999px;
-  border: 1px solid var(--border-subtle);
-  background: var(--blue-main);
-  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #f8fafc;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -267,12 +271,12 @@ body {
 .topbar-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--blue-dark);
+  color: #f8fafc;
 }
 
 .topbar-subtitle {
   font-size: 12px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .topbar-spacer {
@@ -285,11 +289,24 @@ body {
   gap: 10px;
 }
 
+.topbar .pill-soft {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #f8fafc;
+}
+
+.topbar .pill-accent {
+  background: #00a3e0;
+  border-color: #00a3e0;
+  color: #041e42;
+}
+
+/* Chips use simple outlines to stay understated */
 .pill-soft {
   border-radius: var(--radius-pill);
   padding: 5px 10px;
   background: var(--blue-light);
-  border: 1px solid #d0d7e4;
+  border: 1px solid var(--border-subtle);
   font-size: 11px;
   color: var(--blue-dark);
   display: inline-flex;
@@ -297,11 +314,12 @@ body {
   gap: 6px;
 }
 
+/* Accent chip doubles as a quiet button */
 .pill-accent {
   border-radius: var(--radius-pill);
   padding: 6px 11px;
-  background: var(--blue-main);
-  border: 1px solid var(--blue-main);
+  background: var(--accent);
+  border: 1px solid var(--accent);
   font-size: 12px;
   color: #ffffff;
   display: inline-flex;
@@ -348,12 +366,13 @@ body {
    CARDS & LAYOUT
    ========= */
 
+/* Cards share a flat look */
 .card {
   border-radius: var(--radius-lg);
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  padding: 16px 18px;
-  box-shadow: var(--shadow-soft);
+  padding: 14px 16px;
+  box-shadow: none;
 }
 
 .card-alt {
@@ -399,6 +418,7 @@ body {
   }
 }
 
+/* Metric cards look like bare tiles to stay calm */
 .metric-card {
   border-radius: 10px;
   background: #ffffff;
@@ -708,10 +728,11 @@ tbody tr:hover {
   box-shadow: 0 0 0 1px rgba(30, 64, 124, 0.2);
 }
 
+/* Primary buttons keep a flat appearance */
 .button-primary {
   border-radius: var(--radius-pill);
   padding: 7px 14px;
-  border: none;
+  border: 1px solid var(--blue-main);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
@@ -720,24 +741,22 @@ tbody tr:hover {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 6px 16px rgba(30, 64, 124, 0.3);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-    filter var(--transition-fast);
+  box-shadow: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
   margin-top: 6px;
 }
 
 .button-primary:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.03);
-  box-shadow: 0 10px 24px rgba(30, 64, 124, 0.35);
+  background: #0a3569;
 }
 
+/* Ghost buttons become simple outlines */
 .button-ghost {
   border-radius: var(--radius-pill);
   padding: 5px 10px;
-  border: 1px solid #d4d4d8;
-  background: #ffffff;
-  color: var(--blue-main);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--blue-dark);
   font-size: 12px;
   cursor: pointer;
   display: inline-flex;
@@ -749,7 +768,7 @@ tbody tr:hover {
 
 .button-ghost:hover {
   background: var(--blue-light);
-  border-color: #cbd5e1;
+  border-color: var(--blue-light);
 }
 
 .button-icon {
@@ -768,80 +787,153 @@ tbody tr:hover {
    MAP & LAYOUT GRID
    ========= */
 
-/* Frame = the “room” */
+.map-canvas {
+  width: 100%;
+}
+
+/* Frame = the "room", kept muted to avoid visual noise */
 .map-frame {
-  background: #f1f5f9;
-  padding: 10px 10px 12px;
-  border-radius: 12px;
-  border: 1px solid #d4d4d8;
+  background: #f9fbff;
+  padding: 22px;
+  border-radius: 20px;
+  border: 1px solid #d8dfed;
 }
 
 .map-frame-small {
-  padding: 8px;
+  padding: 12px;
 }
 
-/* Vertical stack of rows: top wall, table rows, aisles, bottom wall */
+/* Room wrapper recreates blueprint border */
+.map-room {
+  position: relative;
+  border: 4px solid #111827;
+  border-radius: 26px;
+  min-height: 360px;
+  background: #ffffff;
+  padding: 48px 56px;
+  overflow: visible;
+  box-shadow: inset 0 0 0 2px rgba(17, 24, 39, 0.05);
+}
+
+.map-room-compact {
+  border-width: 3px;
+  border-radius: 20px;
+  padding: 28px 32px;
+  min-height: 260px;
+}
+
+@media (max-width: 768px) {
+  .map-room {
+    padding: 32px;
+    min-height: 280px;
+  }
+}
+
+/* Vertical stack of rows */
 .map-grid {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
+  z-index: 1;
 }
 
-/* A single row in the map (8 columns) */
+.map-grid-compact {
+  gap: 10px;
+}
+
+.map-grid-compact .layout-cell {
+  min-height: 42px;
+  font-size: 11px;
+}
+
+.map-grid-compact .map-walkway-spacer {
+  min-height: 32px;
+}
+
+/* A single row in the map */
 .map-row {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(var(--map-columns, 8), minmax(60px, 1fr));
+  gap: 12px;
+  align-items: stretch;
 }
 
-/* Wall rows (top/bottom) */
-.map-row-wall {
-  margin-bottom: 2px;
-}
-
-/* Aisle rows between table rows */
 .map-row-aisle {
-  margin-top: 2px;
-  margin-bottom: 2px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.map-walkway-spacer {
+  position: relative;
+  min-height: 56px;
+}
+
+.map-walkway-spacer::before {
+  content: "";
+  position: absolute;
+  inset: 0 20%;
+  border-left: 2px dashed #111827;
+  border-right: 2px dashed #111827;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.08),
+    rgba(15, 23, 42, 0.08) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  border-radius: 12px;
+}
+
+.map-walkway-spacer.compact {
+  min-height: 40px;
+}
+
+.map-walkway-spacer.walkway-aisle {
+  min-height: 24px;
 }
 
 /* Cells that represent table slots (students walk between rows) */
 .layout-cell {
-  border-radius: 8px;
-  padding: 7px 6px;
+  border-radius: 6px;
+  padding: 6px 4px;
   text-align: center;
-  font-size: 11px;
-  border: 1px solid #e5e7eb;
+  font-size: 12px;
+  border: 2px solid #1f2937;
   cursor: pointer;
   position: relative;
   background: #ffffff;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-    transform var(--transition-fast), box-shadow var(--transition-fast);
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  transition: transform var(--transition-fast), border-color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .layout-cell:hover {
-  background: var(--blue-light);
-  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  background: #f5f7fb;
 }
 
 .layout-cell.assigned {
   border-color: var(--blue-main);
-  background: #e0ecff;
 }
 
 .layout-cell.sponsor {
   border-color: #f59e0b;
-  background: #fff7e6;
 }
 
 .layout-cell-label {
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .layout-cell-company {
-  font-size: 10px;
+  font-size: 9px;
   color: #4b5563;
-  margin-top: 3px;
+  margin-top: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -856,49 +948,149 @@ tbody tr:hover {
 
 /* Dot indicator for table cell (top-left) */
 .layout-cell-dot {
+  display: none;
+}
+
+/* Wall edges allow free-form placement of doors/exits/extinguishers */
+.map-wall-edge {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--blue-main);
+  pointer-events: auto;
+  border: 1px dashed rgba(4, 30, 66, 0.25);
+  background: rgba(12, 60, 120, 0.04);
+  border-radius: 12px;
+  z-index: 2;
+  cursor: crosshair;
 }
 
-.layout-cell-dot.gold {
-  background: #f59e0b;
+.map-wall-top,
+.map-wall-bottom {
+  left: 48px;
+  right: 48px;
+  height: 36px;
 }
 
-/* Wall cells (top/bottom walls) – constraints go here */
-.map-wall-cell {
-  border-radius: 8px;
-  padding: 5px 6px;
-  border: 1px solid #cbd5e1;
-  background: #dbe2ed;
+.map-wall-top {
+  top: 0;
+  transform: translateY(-60%);
+}
+
+.map-wall-top::after {
+  content: "ENTRANCE / EXIT";
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 10px;
-  text-align: center;
-  min-height: 30px;
-  cursor: pointer;
-  position: relative;
+  color: #0f172a;
+  letter-spacing: 0.08em;
 }
 
-.map-wall-label {
-  font-weight: 500;
-  color: #111827;
+.map-wall-bottom {
+  bottom: 0;
+  transform: translateY(60%);
 }
 
-.map-wall-constraints {
-  margin-top: 2px;
+.map-wall-bottom::after {
+  content: "BACK WALL";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 10px;
-  color: #111827;
+  color: #0f172a;
+  letter-spacing: 0.08em;
+}
+
+.map-wall-left,
+.map-wall-right {
+  top: 48px;
+  bottom: 48px;
+  width: 36px;
+}
+
+.map-room-compact .map-wall-top,
+.map-room-compact .map-wall-bottom {
+  left: 32px;
+  right: 32px;
+}
+
+.map-room-compact .map-wall-left,
+.map-room-compact .map-wall-right {
+  top: 32px;
+  bottom: 32px;
+}
+
+.map-wall-left {
+  left: 0;
+  transform: translateX(-60%);
+}
+
+.map-wall-left::after {
+  content: "WEST";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #0f172a;
+  letter-spacing: 0.08em;
+}
+
+.map-wall-right {
+  right: 0;
+  transform: translateX(60%);
+}
+
+.map-wall-right::after {
+  content: "EAST";
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #0f172a;
+  letter-spacing: 0.08em;
+}
+
+.map-wall-item {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(4, 30, 66, 0.25);
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.map-wall-item:active {
+  cursor: grabbing;
+}
+
+.map-wall-item.horizontal {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.map-wall-item.vertical {
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* Aisle cells – represent walkways between rows */
 .map-aisle-cell {
-  border-radius: 8px;
-  padding: 4px 6px;
-  border: 1px dashed #cbd5e1;
-  background: #e5edf6;
+  border-radius: 4px;
+  padding: 2px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.5);
+  border-bottom: 1px dashed rgba(15, 23, 42, 0.5);
+  background: transparent;
   font-size: 9px;
   text-align: center;
   color: #4b5563;
@@ -907,7 +1099,8 @@ tbody tr:hover {
 
 /* We only label a few aisle cells */
 .map-aisle-label {
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 /* Map helper text under map */
