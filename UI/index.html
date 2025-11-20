@@ -4,18 +4,12 @@
   <meta charset="UTF-8" />
   <title>Career Fair Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- External stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Simple admin layout for career fair data -->
-  <!-- Backdrop for mobile sidebar toggled on mobile to keep focus on the nav -->
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
-  <!-- Page shell wraps sidebar and main content -->
   <div class="app-shell">
-    <!-- Sidebar navigation keeps all primary views reachable -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div>
@@ -25,32 +19,26 @@
       </div>
 
       <div>
-        <!-- Overview links keep the primary dashboard accessible -->
         <div class="sidebar-section-label">Overview</div>
         <div class="sidebar-nav-group">
           <button class="sidebar-button active" data-view-target="view-dashboard">
-            <div class="sidebar-button-icon">📊</div>
             <span>Dashboard</span>
           </button>
         </div>
       </div>
 
       <div>
-        <!-- Navigation for the three main admin tools -->
         <div class="sidebar-section-label">Career Fair</div>
         <div class="sidebar-nav-group">
           <button class="sidebar-button" data-view-target="view-companies">
-            <div class="sidebar-button-icon">🏢</div>
             <span>Companies &amp; Tables</span>
           </button>
 
           <button class="sidebar-button" data-view-target="view-layout">
-            <div class="sidebar-button-icon">🗺️</div>
             <span>Layout &amp; Map</span>
           </button>
 
           <button class="sidebar-button" data-view-target="view-resumes">
-            <div class="sidebar-button-icon">📂</div>
             <span>Resumes</span>
           </button>
         </div>
@@ -61,12 +49,10 @@
       </div>
     </aside>
 
-    <!-- MAIN AREA contains the header and the various views -->
     <main class="main">
-      <!-- Top bar with title and quick actions -->
       <header class="topbar">
         <button class="topbar-menu-button" id="topbar-menu-button">
-          ☰
+          Menu
         </button>
 
         <div class="topbar-title-wrap">
@@ -78,11 +64,10 @@
 
         <div class="topbar-spacer"></div>
 
-        <!-- Utility chips surface live state and actions -->
         <div class="topbar-chip-row">
           <div class="pill-soft">
             <span class="dot-green"></span>
-            <span>Fair status: Scheduled • Mar 2026</span>
+            <span>Fair status: Scheduled &bull; Mar 2026</span>
           </div>
 
           <button class="pill-accent">
@@ -93,10 +78,7 @@
         </div>
       </header>
 
-      <!-- MAIN CONTENT -->
       <section class="main-content">
-        <!-- DASHBOARD VIEW -->
-        <!-- Dashboard with quick stats -->
         <section class="view visible" id="view-dashboard">
           <div class="view-heading-row">
             <div>
@@ -107,12 +89,10 @@
             </div>
 
             <button class="button-ghost" id="btn-refresh-stats">
-              <span class="button-icon">⟳</span>
               <span>Refresh stats</span>
             </button>
           </div>
 
-          <!-- Stat cards summarize the health of the fair -->
           <div class="metrics-row">
             <div class="metric-card">
               <div class="metric-label">Companies in database</div>
@@ -138,7 +118,7 @@
               <div class="metric-label">Sponsor booths</div>
               <div class="metric-value-row">
                 <div class="metric-value" id="metric-sponsors">6</div>
-                <div class="metric-chip">Gold &amp; Silver</div>
+                <div class="metric-chip">Sponsored</div>
               </div>
               <div class="metric-trend">Sponsor info</div>
             </div>
@@ -153,9 +133,7 @@
             </div>
           </div>
 
-          <!-- Individual widgets below highlight deeper data -->
           <div class="layout">
-            <!-- Mini map -->
             <div class="card card-alt">
               <div class="card-header">
                 <div>
@@ -178,12 +156,11 @@
 
               <div class="horizontal-row map-legend">
                 <div class="badge badge-soft">Blue = assigned table</div>
-                <div class="badge badge-soft">Gold = sponsor table</div>
-                <div class="badge">🚪 Door • 🧯 Extinguisher • 🟩 Exit along walls</div>
+                <div class="badge badge-soft">Gold = sponsored table</div>
+                <div class="badge">🚪 Door - 🧯 Extinguisher - 🟩 Exit along walls</div>
               </div>
             </div>
 
-            <!-- Checklist -->
             <div class="card">
               <div class="card-header">
                 <div>
@@ -195,19 +172,17 @@
               </div>
 
               <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-                <li>• Show overall metrics (companies, tables, sponsors, resumes).</li>
-                <li>• Switch to <b>Layout &amp; Map</b> and drag a company onto a table.</li>
-                <li>• Select that table and toggle <b>Sponsor booth</b> on/off.</li>
-                <li>• Drag a 🚪 door and 🧯 extinguisher onto the wall near the entrance.</li>
-                <li>• Unassign a table to show how layout can be adjusted quickly.</li>
-                <li>• Open <b>Resumes</b> and talk about recruiter access to files.</li>
+                <li>- Show overall metrics (companies, tables, sponsors, resumes).</li>
+                <li>- Switch to <b>Layout &amp; Map</b> and drag a company onto a table.</li>
+                <li>- Select that table and toggle <b>Sponsor booth</b> on/off.</li>
+                <li>- Drag a 🚪 door and 🧯 extinguisher onto the wall near the entrance.</li>
+                <li>- Unassign a table to show how layout can be adjusted quickly.</li>
+                <li>- Open <b>Resumes</b> and talk about recruiter access to files.</li>
               </ul>
             </div>
           </div>
         </section>
 
-        <!-- COMPANIES VIEW -->
-        <!-- Companies view -->
         <section class="view" id="view-companies">
           <div class="view-heading-row">
             <div>
@@ -219,14 +194,11 @@
 
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button class="button-ghost" id="btn-clear-filters">
-                <span class="button-icon">✕</span>
                 <span>Reset sample data</span>
               </button>
             </div>
           </div>
 
-          <!-- Each column groups table data with quick stats -->
-          <!-- Resumes view mirrors the dashboard columns for consistency -->
           <div class="layout">
             <div class="card card-alt">
               <div class="card-header">
@@ -250,7 +222,6 @@
                 </div>
               </div>
 
-              <!-- Table below lists every company record -->
               <div class="table-wrap scroll-y">
                 <table>
                   <thead>
@@ -258,7 +229,7 @@
                       <th>Company</th>
                       <th>Website</th>
                       <th>Table (room / row / col)</th>
-                      <th>Sponsor level</th>
+                      <th>Sponsored</th>
                       <th>Majors &amp; roles</th>
                       <th>Visa</th>
                     </tr>
@@ -267,12 +238,9 @@
                 </table>
               </div>
             </div>
-
           </div>
         </section>
 
-        <!-- LAYOUT & MAP VIEW -->
-        <!-- Layout view -->
         <section class="view" id="view-layout">
           <div class="view-heading-row">
             <div>
@@ -284,14 +252,12 @@
 
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button class="button-ghost">
-                <span class="button-icon">🖨️</span>
                 <span>Export map</span>
               </button>
             </div>
           </div>
 
           <div class="layout">
-            <!-- MAP SIDE -->
             <div class="card card-alt">
               <div class="card-header">
                 <div>
@@ -311,7 +277,6 @@
               </div>
 
               <div class="map-frame">
-                <!-- Entrances, aisles, and tables rendered here -->
                 <div class="map-canvas" id="layout-grid"></div>
               </div>
 
@@ -322,7 +287,6 @@
               </div>
             </div>
 
-            <!-- SIDE PANEL -->
             <div class="card">
               <div class="card-header">
                 <div>
@@ -337,7 +301,6 @@
                 <div>Select any table in the map to see details.</div>
               </div>
 
-              <!-- Palettes -->
               <div class="layout-palette">
                 <div class="palette-section">
                   <div class="palette-title">Companies</div>
@@ -359,8 +322,6 @@
           </div>
         </section>
 
-        <!-- RESUMES VIEW -->
-        <!-- Resumes view -->
         <section class="view" id="view-resumes">
           <div class="view-heading-row">
             <div>
@@ -370,10 +331,9 @@
               </div>
             </div>
 
-            <button class="button-ghost">
-              <span class="button-icon">⬆</span>
-              <span>Upload resume</span>
-            </button>
+          <button class="button-ghost">
+            <span>Upload resume</span>
+          </button>
           </div>
 
           <div class="layout">
@@ -387,7 +347,6 @@
                 </div>
               </div>
 
-              <!-- Resume entries get rendered here by admin.js -->
               <div class="resume-list" id="resume-list"></div>
             </div>
 
@@ -401,7 +360,6 @@
                 </div>
               </div>
 
-              <!-- Quick talking points for demo conversations -->
               <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:6px;">
                 <li>Students upload resumes ahead of time.</li>
                 <li>Files stay in controlled storage.</li>
@@ -415,21 +373,6 @@
     </main>
   </div>
 
-  <!-- JS logic -->
   <script src="admin.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -181,9 +181,9 @@ function createEmptyWallSegments() {
 
 // Constraint palette (walls only)
 const constraintTypes = [
-  { type: "door", label: "Door", short: "🚪" },
-  { type: "fire-ex", label: "Fire extinguisher", short: "🧯" },
-  { type: "fire-exit", label: "Fire exit", short: "🟩" },
+  { type: "door", label: "Door", short: "\u{1F6AA}" },
+  { type: "fire-ex", label: "Fire extinguisher", short: "\u{1F9EF}" },
+  { type: "fire-exit", label: "Fire exit", short: "\u{1F7E9}" },
 ];
 
 let wallSegments = createEmptyWallSegments();
@@ -649,8 +649,8 @@ function getConstraintMeta(type) {
 
 /**
  * Build the full map for the Layout view (walls + tables + aisles).
- * compact = false → full map
- * compact = true  → simplified grid for dashboard
+ * compact = false -> full map
+ * compact = true  -> simplified grid for dashboard
  */
 /**
  * Renders all table cells and wall segments for the dashboard + layout views.
@@ -892,10 +892,9 @@ function showTableDetails(table) {
       );
     }
 
-    const sponsorText =
-      company.sponsorTier === "none" ? "None" : company.sponsorLabel;
+    const sponsorText = company.sponsorTier === "none" ? "Not sponsored" : "Sponsored";
     info.push(
-      `<div>Sponsor level: <span class="layout-details-strong">${sponsorText}</span></div>`
+      `<div>Sponsor: <span class="layout-details-strong">${sponsorText}</span></div>`
     );
 
     const majorsText = company.majors.length
@@ -1152,8 +1151,9 @@ function renderCompanyTable() {
 
     const sponsorTd = document.createElement("td");
     const label = document.createElement("span");
-    label.className = "tag" + (company.sponsorTier !== "none" ? " tag-sponsor" : "");
-    label.textContent = company.sponsorTier === "none" ? "None" : company.sponsorLabel;
+    const isSponsored = company.sponsorTier !== "none";
+    label.className = "tag" + (isSponsored ? " tag-sponsor" : "");
+    label.textContent = isSponsored ? "Sponsored" : "Not sponsored";
     sponsorTd.appendChild(label);
     tr.appendChild(sponsorTd);
 
@@ -1221,11 +1221,8 @@ function renderCompanyPalette() {
   companies.forEach((company) => {
     const item = document.createElement("div");
     item.className = "palette-item palette-item-company";
-    const sponsorLabel = company.sponsorLabel || company.sponsorTier;
-    item.textContent =
-      company.sponsorTier === "none"
-        ? company.name
-        : `${company.name} (${sponsorLabel})`;
+    const sponsorText = company.sponsorTier === "none" ? "" : " (Sponsored)";
+    item.textContent = `${company.name}${sponsorText}`;
     item.draggable = true;
     item.dataset.companyId = company.id;
 
