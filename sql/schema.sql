@@ -121,3 +121,21 @@ CREATE TABLE company_position_titles (
         REFERENCES position_titles (title_id)
         ON DELETE CASCADE
 );
+
+-- Admin Users Table
+CREATE TABLE admin_users (
+    admin_id    SERIAL PRIMARY KEY,
+    email    VARCHAR(50) NOT NULL UNIQUE,
+    password    VARCHAR(255) NOT NULL,
+    first_name  VARCHAR(50) NOT NULL,
+    last_name   VARCHAR(50) NOT NULL
+)
+
+-- Student Users Table
+CREATE TABLE student_users (
+    student_id  SERIAL PRIMARY KEY,
+    email       VARCHAR(50) NOT NULL UNIQUE,
+    password    VARCHAR(255) NOT NULL,
+    first_name  VARCHAR(50) NOT NULL,
+    last_name   VARCHAR(50) NOT NULL
+);
