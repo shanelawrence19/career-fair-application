@@ -1268,6 +1268,8 @@ const resumeListEl = document.getElementById("resume-list");
  * Rebuilds the resume list with the latest normalized data.
  */
 function renderResumes() {
+  if (!resumeListEl) return;
+
   resumeListEl.innerHTML = "";
   resumes.forEach((resume) => {
     const company =
@@ -1349,7 +1351,6 @@ initializeAdminDashboard();
 // This refreshes the simple metrics at the top
 
 const metricCompanies = document.getElementById("metric-companies");
-const metricCompaniesTrend = document.getElementById("metric-companies-trend");
 const metricTablesAssigned = document.getElementById("metric-tables-assigned");
 const metricTablesFree = document.getElementById("metric-tables-free");
 const metricSponsors = document.getElementById("metric-sponsors");
@@ -1367,15 +1368,24 @@ function renderMetrics() {
     companies.flatMap((c) => c.majors || [])
   ).size;
 
-  metricCompanies.textContent = String(companyCount);
-  metricCompaniesTrend.textContent = "Sample data loaded";
-  metricTablesAssigned.textContent = String(tablesAssigned);
-  metricTablesFree.textContent = `${Math.max(
-    tables.length - tablesAssigned,
-    0
-  )} free`;
-  metricSponsors.textContent = String(sponsorsCount);
-  metricResumes.textContent = String(majorsCovered);
+  if (metricCompanies) {
+    metricCompanies.textContent = String(companyCount);
+  }
+  if (metricTablesAssigned) {
+    metricTablesAssigned.textContent = String(tablesAssigned);
+  }
+  if (metricTablesFree) {
+    metricTablesFree.textContent = `${Math.max(
+      tables.length - tablesAssigned,
+      0
+    )} free`;
+  }
+  if (metricSponsors) {
+    metricSponsors.textContent = String(sponsorsCount);
+  }
+  if (metricResumes) {
+    metricResumes.textContent = String(majorsCovered);
+  }
 }
 
 refreshStatsButton.addEventListener("click", () => {

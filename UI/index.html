@@ -37,10 +37,6 @@
           <button class="sidebar-button" data-view-target="view-layout">
             <span>Layout &amp; Map</span>
           </button>
-
-          <button class="sidebar-button" data-view-target="view-resumes">
-            <span>Resumes</span>
-          </button>
         </div>
       </div>
 
@@ -58,7 +54,7 @@
         <div class="topbar-title-wrap">
           <div class="topbar-title">Admin Control Center</div>
           <div class="topbar-subtitle">
-            Layout, companies, sponsors, and resumes for the upcoming fair.
+            Layout, companies, sponsors, and assignments for the upcoming fair.
           </div>
         </div>
 
@@ -84,7 +80,7 @@
             <div>
               <div class="view-title">Dashboard</div>
               <div class="view-subtitle">
-                High-level snapshot of companies, tables, sponsors, and resumes.
+                High-level snapshot of companies, tables, and sponsors.
               </div>
             </div>
 
@@ -95,41 +91,24 @@
 
           <div class="metrics-row">
             <div class="metric-card">
+              <div class="metric-value" id="metric-companies">28</div>
               <div class="metric-label">Companies in database</div>
-              <div class="metric-value-row">
-                <div class="metric-value" id="metric-companies">28</div>
-                <div class="metric-chip">Goal: 30</div>
-              </div>
-              <div class="metric-trend" id="metric-companies-trend">
-                Sample data
-              </div>
             </div>
 
             <div class="metric-card">
+              <div class="metric-value" id="metric-tables-assigned">22</div>
               <div class="metric-label">Table assignments</div>
-              <div class="metric-value-row">
-                <div class="metric-value" id="metric-tables-assigned">22</div>
-                <div class="metric-chip" id="metric-tables-free">10 free</div>
-              </div>
-              <div class="metric-trend">Table assignment info</div>
+              <div class="metric-subtext" id="metric-tables-free">10 free</div>
             </div>
 
             <div class="metric-card">
+              <div class="metric-value" id="metric-sponsors">6</div>
               <div class="metric-label">Sponsor booths</div>
-              <div class="metric-value-row">
-                <div class="metric-value" id="metric-sponsors">6</div>
-                <div class="metric-chip">Sponsored</div>
-              </div>
-              <div class="metric-trend">Sponsor info</div>
             </div>
 
             <div class="metric-card">
+              <div class="metric-value" id="metric-resumes">83</div>
               <div class="metric-label">Majors linked</div>
-              <div class="metric-value-row">
-                <div class="metric-value" id="metric-resumes">83</div>
-                <div class="metric-chip">Majors linked</div>
-              </div>
-              <div class="metric-trend">Distinct majors connected</div>
             </div>
           </div>
 
@@ -172,12 +151,11 @@
               </div>
 
               <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-                <li>- Show overall metrics (companies, tables, sponsors, resumes).</li>
+                <li>- Show overall metrics (companies, tables, sponsors, majors).</li>
                 <li>- Switch to <b>Layout &amp; Map</b> and drag a company onto a table.</li>
                 <li>- Select that table and toggle <b>Sponsor booth</b> on/off.</li>
                 <li>- Drag a 🚪 door and 🧯 extinguisher onto the wall near the entrance.</li>
                 <li>- Unassign a table to show how layout can be adjusted quickly.</li>
-                <li>- Open <b>Resumes</b> and talk about recruiter access to files.</li>
               </ul>
             </div>
           </div>
@@ -321,53 +299,6 @@
           </div>
         </section>
 
-        <section class="view" id="view-resumes">
-          <div class="view-heading-row">
-            <div>
-              <div class="view-title">Resumes</div>
-              <div class="view-subtitle">
-                Uploaded student resumes by company.
-              </div>
-            </div>
-
-          <button class="button-ghost">
-            <span>Upload resume</span>
-          </button>
-          </div>
-
-          <div class="layout">
-            <div class="card card-alt">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">Recently uploaded resumes</div>
-                  <div class="card-subtitle">
-                    Stored in secure storage.
-                  </div>
-                </div>
-              </div>
-
-              <div class="resume-list" id="resume-list"></div>
-            </div>
-
-            <div class="card">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">Talking points</div>
-                  <div class="card-subtitle">
-                    How recruiters interact with resumes during the fair.
-                  </div>
-                </div>
-              </div>
-
-              <ul style="font-size:13px; display:flex; flex-direction:column; gap:8px; margin-top:6px;">
-                <li>Students upload resumes ahead of time.</li>
-                <li>Files stay in controlled storage.</li>
-                <li>Recruiters filter by company, major, and graduation date.</li>
-                <li>The backend will make these actions work.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
       </section>
     </main>
   </div>
