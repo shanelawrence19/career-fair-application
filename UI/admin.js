@@ -961,7 +961,7 @@ function showTableDetails(table) {
  * Handle drops on tables: ONLY companies here.
  */
 /**
- * Handles all drag-n-drop interactions that target a table.
+ * Handles all drag and drop interactions that target a table.
  */
 function handleDropOnTable(e, table) {
   const dropType = e.dataTransfer.getData("type");
